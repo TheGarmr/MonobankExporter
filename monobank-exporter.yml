@@ -1,0 +1,12 @@
+monobank-exporter:
+  clients:
+    - name: "Jack"
+      token: "valid-token"
+    - name: "Anna"
+      token: "valid-token"
+  webhookUrl: "http://my-domain.com/webhook"
+  currenciesRefreshTimeInMinutes: 10
+  clientsRefreshTimeInMinutes: 60
+redis:
+  host: "localhost"
+  port: "6379"

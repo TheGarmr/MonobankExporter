@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  exporter:
+    container_name: monobank-exporter
+    restart: always
+    build:
+      context: .
+      dockerfile: MonobankExporter.API/Dockerfile
+    ports:
+      - "27000:80"
+    volumes:
+      - ./monobank-exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
+    environment:
+      - TZ=Europe/Kiev
+
+  redis:
+    image: redis:latest
+    container_name: monobank-exporter-redis
+    restart: always
