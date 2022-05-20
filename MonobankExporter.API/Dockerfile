@@ -1,22 +1,24 @@
-FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
-WORKDIR /etc/monobank-exporter
-EXPOSE 80
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS publish
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-WORKDIR /src
+WORKDIR /etc/monobank-exporter
+
 COPY ["Monobank.Core/Monobank.Core.csproj", "Monobank.Core/"]
 COPY ["Monobank.Tests/Monobank.Tests.csproj", "Monobank.Tests/"]
 COPY ["MonobankExporter.API/MonobankExporter.API.csproj", "MonobankExporter.API/"]
 
-RUN dotnet restore "MonobankExporter.API/MonobankExporter.API.csproj"
+RUN dotnet restore "MonobankExporter.API/MonobankExporter.API.csproj" --runtime alpine-x64
 COPY . .
-WORKDIR "/src/MonobankExporter.API"
-RUN dotnet build "MonobankExporter.API.csproj" -c Release -o /etc/monobank-exporter/build
 
-FROM build AS publish
-RUN dotnet publish "MonobankExporter.API.csproj" -c Release -o /etc/monobank-exporter/publish
+RUN dotnet publish "MonobankExporter.API/MonobankExporter.API.csproj" -c Release \
+    -o /etc/monobank-exporter/publish \
+    --no-restore \
+    --runtime alpine-x64 \
+    --self-contained true \
+    /p:PublishTrimmed=true \
+    /p:PublishSingleFile=true
 
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/runtime-deps:5.0-alpine AS final
 WORKDIR /etc/monobank-exporter
+EXPOSE 80
 COPY --from=publish /etc/monobank-exporter/publish .
-ENTRYPOINT ["dotnet", "MonobankExporter.API.dll"]
+ENTRYPOINT ["./MonobankExporter.API"]
