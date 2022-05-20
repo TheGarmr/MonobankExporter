@@ -9,7 +9,7 @@ namespace MonobankExporter.API.Extensions
         {
             return builder.ConfigureAppConfiguration(configBuilder =>
             {
-                configBuilder.AddYamlFile("./monobank-exporter.yml", optional: true);
+                configBuilder.AddYamlFile("./monobank-exporter.yml", optional: true, reloadOnChange: true);
             });
         }
     }
