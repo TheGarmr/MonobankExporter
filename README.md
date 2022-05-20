@@ -21,7 +21,7 @@
 ### monobank-exporter usage
   * minimal request time for client info is 2 minutes
   * minimal request time for currencies info is 10 minutes
-  * use http or https for webhook only
+  * use HTTP or HTTPS for webhook only
   * `/webhook` ending is mandatory
   * a Redis instance is mandatory if you will use webhooks.
 
@@ -44,6 +44,8 @@ services:
       - TZ=Europe/Kiev
     depends_on:
       - monobank-exporter-redis
+    networks:
+      - exporter-network
 
   redis:
     image: redis:latest
