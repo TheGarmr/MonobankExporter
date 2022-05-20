@@ -57,7 +57,7 @@ namespace MonobankExporter.API.Extensions
 
         internal static IServiceCollection AddMonobankExporterOptions(this IServiceCollection services, IConfiguration configuration)
         {
-            var options = configuration.GetSection("monobank-exporter").Get<MonobankExporterOptions>();
+            var options = configuration.GetSection("monobank-exporter").Get<MonobankExporterOptions>() ?? new MonobankExporterOptions();
             services.AddSingleton(options);
             return services;
         }
