@@ -21,9 +21,9 @@ namespace MonobankExporter.API.Services
 
         }
 
-        public async Task RefreshAsync(string key, CancellationToken token = new CancellationToken())
+        public Task RefreshAsync(string key, CancellationToken token = new CancellationToken())
         {
-
+            return Task.CompletedTask;
         }
 
         public void Remove(string key)
@@ -31,9 +31,9 @@ namespace MonobankExporter.API.Services
 
         }
 
-        public async Task RemoveAsync(string key, CancellationToken token = new CancellationToken())
+        public Task RemoveAsync(string key, CancellationToken token = new CancellationToken())
         {
-
+            return Task.CompletedTask;
         }
 
         public void Set(string key, byte[] value, DistributedCacheEntryOptions options)
@@ -41,10 +41,10 @@ namespace MonobankExporter.API.Services
 
         }
 
-        public async Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options,
+        public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options,
             CancellationToken token = new CancellationToken())
         {
-
+            return Task.CompletedTask;
         }
     }
 }
