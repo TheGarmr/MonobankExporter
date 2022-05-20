@@ -20,6 +20,7 @@ namespace MonobankExporter.API
         
         public void ConfigureServices(IServiceCollection services)
         {
+            Console.WriteLine("running monobank-exporter. version 1.0");
             services.AddControllers();
             services.AddRedisCache(Configuration);
             services.AddPrometheusExporter();
