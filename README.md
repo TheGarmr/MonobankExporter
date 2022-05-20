@@ -4,15 +4,15 @@
 ### Full API documentation can be found here: [Monobank open API](https://api.monobank.ua/docs/)
 
 ### Functionality
-* Publish currencies metrics
-* Publish a client's balance and credit limit for each card as metrics
-* You can use your own name different from that stored in the bank
+  * Publish currencies metrics
+  * Publish a client's balance and credit limit for each card as metrics
+  * You can use your own name different from that stored in the bank
 
 ### API limitations:
   * You can receive information about a client once per a minute
   * Information about currencies refreshes once per 5 minutes
 
-### Quick start:
+### Quickstart:
   * create a docker-compose file
   * fill in a config file
   * setup you Prometheus instance to scrape metrics
