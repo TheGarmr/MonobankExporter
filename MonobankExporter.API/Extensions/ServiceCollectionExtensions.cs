@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MonobankExporter.API.Interfaces;
 using MonobankExporter.API.Models;
@@ -14,15 +15,22 @@ namespace MonobankExporter.API.Extensions
         {
             services.AddTransient<IRedisCacheService, RedisCacheService>();
             var redisOptions = configuration.GetSection("redis").Get<RedisOptions>();
-            services.AddStackExchangeRedisCache(options =>
+            if (redisOptions != null && !string.IsNullOrWhiteSpace(redisOptions.Host) && !string.IsNullOrWhiteSpace(redisOptions.Port))
             {
-                options.InstanceName = "MonobankExporter";
-                options.ConfigurationOptions = new ConfigurationOptions
+                services.AddStackExchangeRedisCache(options =>
                 {
-                    EndPoints = { redisOptions.Host, redisOptions.Port },
-                    AbortOnConnectFail = false
-                };
-            });
+                    options.InstanceName = "MonobankExporter";
+                    options.ConfigurationOptions = new ConfigurationOptions
+                    {
+                        EndPoints = { redisOptions.Host, redisOptions.Port },
+                        AbortOnConnectFail = false
+                    };
+                });
+            }
+            else
+            {
+                services.Add(ServiceDescriptor.Singleton<IDistributedCache, DistributedCacheMock>());
+            }
 
             return services;
         }
