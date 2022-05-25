@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS publish
+FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS publish
 
 WORKDIR /etc/monobank-exporter
 
@@ -20,7 +20,7 @@ RUN dotnet publish "MonobankExporter.API/MonobankExporter.API.csproj" \
     /p:PublishTrimmed=true \
     /p:PublishSingleFile=true
 
-FROM mcr.microsoft.com/dotnet/runtime-deps:5.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine AS final
 
 RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime
 
