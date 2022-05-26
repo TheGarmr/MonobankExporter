@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MonobankExporter.API.Extensions;
+using MonobankExporter.API.Middleware;
 using Prometheus;
 
 namespace MonobankExporter.API
@@ -27,6 +28,7 @@ namespace MonobankExporter.API
             services.AddMonobankExporterOptions(Configuration);
             services.AddMonobankService();
             services.AddBackgroundWorkers();
+            services.AddBasicAuthOptions(Configuration);
         }
         
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -38,11 +40,17 @@ namespace MonobankExporter.API
 
             app.UseRouting();
 
+            app.Map("/metrics", metricsApp =>
+            {
+                metricsApp.UseMiddleware<BasicAuthMiddleware>();
+                metricsApp.UseMetricServer("");
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapMetrics();
             });
+
             Metrics.SuppressDefaultMetrics();
             Console.Clear();
         }
