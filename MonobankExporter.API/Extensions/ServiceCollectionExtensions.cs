@@ -61,5 +61,12 @@ namespace MonobankExporter.API.Extensions
             services.AddSingleton(options);
             return services;
         }
+
+        internal static IServiceCollection AddBasicAuthOptions(this IServiceCollection services, IConfiguration configuration)
+        {
+            var options = configuration.GetSection("basic-auth").Get<BasicAuthOptions>() ?? new BasicAuthOptions();
+            services.AddSingleton(options);
+            return services;
+        }
     }
 }
