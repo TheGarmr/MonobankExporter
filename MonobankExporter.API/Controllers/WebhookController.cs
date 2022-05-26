@@ -18,7 +18,7 @@ namespace MonobankExporter.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<string>> Webhook([FromBody] WebHookModel webhook, CancellationToken stoppingToken)
+        public async Task<ActionResult> Webhook([FromBody] WebHookModel webhook, CancellationToken stoppingToken)
         {
             await _webHookService.ExportMetricsForWebHook(webhook, stoppingToken);
             return Ok();
