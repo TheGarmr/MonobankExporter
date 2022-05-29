@@ -31,13 +31,8 @@ namespace MonobankExporter.API
             services.AddBasicAuthOptions(Configuration);
         }
         
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             app.UseRouting();
 
             app.Map("/metrics", metricsApp =>
