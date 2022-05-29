@@ -16,6 +16,7 @@ RUN dotnet publish "MonobankExporter.API/MonobankExporter.API.csproj" \
     --no-logo \
     --runtime alpine-x64 \
     --self-contained true \
+    --verbosity quiet \
     /p:PublishTrimmed=true \
     /p:PublishSingleFile=true
 
