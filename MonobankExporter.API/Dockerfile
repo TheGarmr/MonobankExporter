@@ -10,8 +10,8 @@ RUN dotnet restore "MonobankExporter.API/MonobankExporter.API.csproj" --runtime 
 COPY . .
 
 RUN dotnet publish "MonobankExporter.API/MonobankExporter.API.csproj" \
-    -c Release \
-    -o /etc/monobank-exporter/publish \
+    --configuration Release \
+    --output /etc/monobank-exporter/publish \
     --no-restore \
     --no-logo \
     --runtime alpine-x64 \
