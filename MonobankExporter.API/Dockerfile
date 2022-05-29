@@ -9,7 +9,8 @@ COPY ["MonobankExporter.API/MonobankExporter.API.csproj", "MonobankExporter.API/
 RUN dotnet restore "MonobankExporter.API/MonobankExporter.API.csproj" --runtime alpine-x64
 COPY . .
 
-RUN dotnet publish "MonobankExporter.API/MonobankExporter.API.csproj" -c Release \
+RUN dotnet publish "MonobankExporter.API/MonobankExporter.API.csproj" \
+    -c Release \
     -o /etc/monobank-exporter/publish \
     --no-restore \
     --no-logo \
