@@ -52,7 +52,6 @@ namespace MonobankExporter.API
             });
 
             Metrics.SuppressDefaultMetrics();
-            Console.Clear();
         }
     }
 }
