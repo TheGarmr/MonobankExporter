@@ -10,17 +10,17 @@ namespace MonobankExporter.API.Controllers
     [Route("[controller]")]
     public class WebhookController : ControllerBase
     {
-        private readonly IWebHookService _webHookService;
+        private readonly IMonobankService _monobankService;
 
-        public WebhookController(IWebHookService webHookService)
+        public WebhookController(IMonobankService webHookService)
         {
-            _webHookService = webHookService;
+            _monobankService = webHookService;
         }
 
         [HttpPost]
         public async Task<ActionResult> Webhook([FromBody] WebHookModel webhook, CancellationToken stoppingToken)
         {
-            await _webHookService.ExportMetricsForWebHook(webhook, stoppingToken);
+            await _monobankService.ExportMetricsForWebHook(webhook, stoppingToken);
             return Ok();
         }
     }

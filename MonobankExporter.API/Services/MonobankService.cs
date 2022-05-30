@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Monobank.Core;
+using Monobank.Core.Models;
 using MonobankExporter.API.Interfaces;
 using MonobankExporter.API.Models;
 using Newtonsoft.Json;
@@ -32,29 +33,21 @@ namespace MonobankExporter.API.Services
             }
         }
 
-        public async Task<bool> SetupWebHookForUsers(CancellationToken stoppingToken)
+        public async Task SetupWebHookForUsers(string webHookUrl, CancellationToken stoppingToken)
         {
-            if (!WebHookUrlIsValid(_options.WebhookUrl))
-            {
-                return false;
-            }
-
             try
             {
                 foreach (var client in _options.Clients.Select(clientInfo => new MonoClient(clientInfo.Token)))
                 {
-                    await client.Client.SetWebhookAsync(_options.WebhookUrl, stoppingToken);
+                    await client.Client.SetWebhookAsync(webHookUrl, stoppingToken);
                 }
-                
+
                 LogMessage("The setup of the webhook was successful.");
-                return true;
             }
             catch
             {
-                LogMessage($"The setup of the webhook for users unexpectedly failed. Url: {_options.WebhookUrl}");
+                LogMessage($"The setup of the webhook for users unexpectedly failed. Url: {webHookUrl}");
             }
-
-            return false;
         }
 
         public async Task ExportCurrenciesMetrics(CancellationToken stoppingToken)
@@ -89,7 +82,36 @@ namespace MonobankExporter.API.Services
             }
         }
 
-        private async Task ExportMetricsForUser(bool webhookWillBeUsed, ClientInfoOptions clientInfo, CancellationToken stoppingToken)
+        public async Task ExportMetricsForWebHook(WebHookModel webhook, CancellationToken stoppingToken)
+        {
+            LogMessage($"A webHook received. Card: {webhook?.Data?.Account}...");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(webhook?.Data?.Account) || webhook.Data?.StatementItem == null)
+                {
+                    LogMessage($"The webHook has invalid data. Metrics won't be exposed. Card: {webhook?.Data?.Account}...");
+                    return;
+                }
+
+                var cacheRecord = await _redisCacheService.GetRecordAsync(webhook.Data.Account, stoppingToken);
+
+                var accountInfo = JsonConvert.DeserializeObject<AccountInfoModel>(cacheRecord);
+                if (accountInfo == null)
+                {
+                    LogMessage($"The cache doesn't contain a record with account info. Metrics won't be exposed. Card: {webhook.Data.Account}...");
+                    return;
+                }
+
+                _prometheusExporter.ObserveAccount(accountInfo, webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit);
+                LogMessage($"Observed metrics by webhook for {accountInfo.HolderName}...");
+            }
+            catch
+            {
+                LogMessage("Observing of currencies from webhook unexpectedly failed.");
+            }
+        }
+
+        private async Task ExportMetricsForUser(bool webHookWillBeUsed, ClientInfoOptions clientInfo, CancellationToken stoppingToken)
         {
             try
             {
@@ -117,7 +139,7 @@ namespace MonobankExporter.API.Services
                     var cacheRecord = JsonConvert.SerializeObject(accountInfo);
                     _prometheusExporter.ObserveAccount(accountInfo, account.BalanceWithoutCreditLimit);
 
-                    if (webhookWillBeUsed)
+                    if (webHookWillBeUsed)
                     {
                         await _redisCacheService.SetRecordAsync(account.Id, cacheRecord, DateTime.UtcNow.AddMinutes(_options.ClientsRefreshTimeInMinutes + 1), stoppingToken);
                     }
@@ -130,36 +152,41 @@ namespace MonobankExporter.API.Services
             }
         }
 
-        private bool WebHookUrlIsValid(string webhookUrl)
+        public bool WebHookUrlIsValid(string webHookUrl)
         {
-            LogMessage($"Validating webhook url from configs: {webhookUrl}.");
-
-            if (string.IsNullOrWhiteSpace(webhookUrl))
+            if (string.IsNullOrWhiteSpace(webHookUrl))
             {
                 LogMessage("The webhook url is empty.");
+
                 return false;
             }
 
-            var isUrl = Uri.TryCreate(webhookUrl, UriKind.Absolute, out var uriResult);
+            LogMessage($"Validating webhook url from configs: {webHookUrl}.");
+
+            var isUrl = Uri.TryCreate(webHookUrl, UriKind.Absolute, out var uriResult);
             if (!isUrl)
             {
                 LogMessage("The webhook url has bad format.");
+
                 return false;
             }
 
             if (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps)
             {
                 LogMessage("The webhook url does not contain HTTP or HTTPS.");
+
                 return false;
             }
 
             if (!uriResult.AbsoluteUri.Contains("/webhook"))
             {
                 LogMessage("The webhook url does not contain the '/webhook' path.");
+
                 return false;
             }
 
             LogMessage("Webhook url is valid. Webhook and Redis will be used.");
+
             return true;
         }
 

@@ -50,8 +50,7 @@ namespace MonobankExporter.API.Extensions
 
         internal static IServiceCollection AddMonobankService(this IServiceCollection services)
         {
-            services.AddSingleton<IMonobankService, MonobankService>();
-            services.AddSingleton<IWebHookService, WebHookService>();
+            services.AddScoped<IMonobankService, MonobankService>();
             return services;
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MonobankExporter.API.Interfaces;
 using MonobankExporter.API.Models;
@@ -9,26 +10,45 @@ namespace MonobankExporter.API.Workers
 {
     public class BalanceWorker : BackgroundService
     {
-        private readonly IMonobankService _monobankService;
         private readonly MonobankExporterOptions _options;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public BalanceWorker(IMonobankService monobankService, MonobankExporterOptions options)
+        public BalanceWorker(MonobankExporterOptions options, IServiceScopeFactory scopeFactory)
         {
-            _monobankService = monobankService;
             _options = options;
+            _scopeFactory = scopeFactory;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             return Task.Run(async () =>
             {
-                var webhookWillBeUsed = await _monobankService.SetupWebHookForUsers(stoppingToken);
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    await _monobankService.ExportUsersMetrics(webhookWillBeUsed, stoppingToken);
+                    await ProcessAsync(stoppingToken);
                     Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
                 }
             }, stoppingToken);
+        }
+
+        private async Task ProcessAsync(CancellationToken cancellationToken)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
+                var webhookWillBeUsed = monobankService.WebHookUrlIsValid(_options.WebhookUrl);
+                if (webhookWillBeUsed)
+                {
+                    await monobankService.SetupWebHookForUsers(_options.WebhookUrl, cancellationToken);
+                }
+                await monobankService.ExportUsersMetrics(webhookWillBeUsed, cancellationToken);
+            }
+            catch
+            {
+                Console.WriteLine($"[{DateTime.Now}] ");
+            }
         }
     }
 }
