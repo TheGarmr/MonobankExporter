@@ -7,6 +7,7 @@
   * Publish currencies metrics
   * Publish a client's balance and credit limit for each card as metrics
   * You can use your own name different from that stored in the bank
+  * basic auth to the metrics endpoint
 
 ### API limitations:
   * You can receive information about a client once per a minute
@@ -24,6 +25,7 @@
   * use HTTP or HTTPS for webhook only
   * `/webhook` ending is mandatory
   * a Redis instance is mandatory if you will use webhooks.
+  * basic auth is not required. it can be added from the config
 
 Currencies metrics will be provisioned in any case.<br>
 The client's metrics will be provisioned only in the case of the existing token.<br>
@@ -100,4 +102,10 @@ monobank-exporter:
 redis:
   host: "monobank-exporter-redis"
   port: "6379"
+basic-auth:
+  username: "admin"
+  password: "admin"
 ```
+
+# What's new
+  * 1.1 - Added ability to set up basic auth for the `metrics` endpoint
