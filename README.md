@@ -1,6 +1,6 @@
 # Monobank Exporter [<img src="https://img.shields.io/badge/Docker%20Hub-images-blue.svg?logo=Docker">](https://hub.docker.com/r/thegarmr/monobank-exporter)
 ### This application exports _Prometheus_ metrics for [Monobank](https://www.monobank.ua).
-###  This app was built with the [Monobank API library](https://github.com/maisak/monobank-api).
+### This app was built with the [Monobank API library](https://github.com/maisak/monobank-api).
 ### Full API documentation can be found here: [Monobank open API](https://api.monobank.ua/docs/)
 
 ### Functionality
