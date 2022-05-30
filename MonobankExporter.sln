@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monobank.Tests", "Monobank.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonobankExporter.BusinessLogic", "MonobankExporter.BusinessLogic\MonobankExporter.BusinessLogic.csproj", "{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonobankExporter.UnitTests", "MonobankExporter.UnitTests\MonobankExporter.UnitTests.csproj", "{2B71B77A-BFDE-42EC-A0F8-42538E33F32B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B71B77A-BFDE-42EC-A0F8-42538E33F32B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B71B77A-BFDE-42EC-A0F8-42538E33F32B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B71B77A-BFDE-42EC-A0F8-42538E33F32B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B71B77A-BFDE-42EC-A0F8-42538E33F32B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
