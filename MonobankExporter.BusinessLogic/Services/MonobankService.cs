@@ -172,6 +172,7 @@ namespace MonobankExporter.BusinessLogic.Services
             _logger.LogInformation($"Validating webhook url from configs: {webHookUrl}.");
 
             var isUrl = Uri.TryCreate(webHookUrl, UriKind.Absolute, out var uriResult);
+            // ToDo: add validation that domain works correctly
             if (!isUrl)
             {
                 _logger.LogWarning("The webhook url has bad format.");
