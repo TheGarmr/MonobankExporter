@@ -35,7 +35,7 @@ namespace MonobankExporter.API
 
             app.Map("/metrics", metricsApp =>
             {
-                metricsApp.UseMiddleware<BasicAuthMiddleware>();
+                metricsApp.UseBasicAuth();
                 metricsApp.UseMetricServer("");
             });
 
