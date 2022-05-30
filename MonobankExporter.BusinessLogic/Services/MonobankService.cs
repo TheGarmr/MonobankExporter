@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Monobank.Core;
 using Monobank.Core.Models;
 using MonobankExporter.BusinessLogic.Interfaces;
@@ -16,13 +17,18 @@ namespace MonobankExporter.BusinessLogic.Services
         private readonly MonobankExporterOptions _options;
         private readonly IRedisCacheService _redisCacheService;
         private readonly IPrometheusExporterService _prometheusExporter;
+        private readonly ILogger<MonobankService> _logger;
 
-        public MonobankService(MonobankExporterOptions options, IPrometheusExporterService prometheusExporter, IRedisCacheService redisCacheService)
+        public MonobankService(MonobankExporterOptions options,
+            IPrometheusExporterService prometheusExporter,
+            IRedisCacheService redisCacheService,
+            ILogger<MonobankService> logger)
         {
             _client = new MonoClient();
             _options = options;
             _prometheusExporter = prometheusExporter;
             _redisCacheService = redisCacheService;
+            _logger = logger;
         }
 
         public async Task ExportUsersMetrics(bool webhookWillBeUsed, CancellationToken stoppingToken)
@@ -42,11 +48,11 @@ namespace MonobankExporter.BusinessLogic.Services
                     await client.Client.SetWebhookAsync(webHookUrl, stoppingToken);
                 }
 
-                LogMessage("The setup of the webhook was successful.");
+                _logger.LogInformation("The setup of the webhook was successful.");
             }
             catch
             {
-                LogMessage($"The setup of the webhook for users unexpectedly failed. Url: {webHookUrl}");
+                _logger.LogError($"The setup of the webhook for users unexpectedly failed. Url: {webHookUrl}");
             }
         }
 
@@ -74,22 +80,22 @@ namespace MonobankExporter.BusinessLogic.Services
                         _prometheusExporter.ObserveCurrency(currency.CurrencyNameA, currency.CurrencyNameB, CurrencyObserveType.Cross, currency.RateCross);
                     }
                 }
-                LogMessage("Observed currencies metrics...");
+                _logger.LogInformation("Observed currencies metrics...");
             }
             catch
             {
-                LogMessage("Observing of currencies metrics unexpectedly failed.");
+                _logger.LogError("Observing of currencies metrics unexpectedly failed.");
             }
         }
 
         public async Task ExportMetricsForWebHook(WebHookModel webhook, CancellationToken stoppingToken)
         {
-            LogMessage($"A webHook received. Card: {webhook?.Data?.Account}...");
+            _logger.LogInformation($"A webHook received. Card: {webhook?.Data?.Account}...");
             try
             {
                 if (string.IsNullOrWhiteSpace(webhook?.Data?.Account) || webhook.Data?.StatementItem == null)
                 {
-                    LogMessage($"The webHook has invalid data. Metrics won't be exposed. Card: {webhook?.Data?.Account}...");
+                    _logger.LogInformation($"The webHook has invalid data. Metrics won't be exposed. Card: {webhook?.Data?.Account}...");
                     return;
                 }
 
@@ -98,16 +104,16 @@ namespace MonobankExporter.BusinessLogic.Services
                 var accountInfo = JsonConvert.DeserializeObject<AccountInfoModel>(cacheRecord);
                 if (accountInfo == null)
                 {
-                    LogMessage($"The cache doesn't contain a record with account info. Metrics won't be exposed. Card: {webhook.Data.Account}...");
+                    _logger.LogWarning($"The cache doesn't contain a record with account info. Metrics won't be exposed. Card: {webhook.Data.Account}...");
                     return;
                 }
 
                 _prometheusExporter.ObserveAccount(accountInfo, webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit);
-                LogMessage($"Observed metrics by webhook for {accountInfo.HolderName}...");
+                _logger.LogInformation($"Observed metrics by webhook for {accountInfo.HolderName}...");
             }
             catch
             {
-                LogMessage("Observing of currencies from webhook unexpectedly failed.");
+                _logger.LogError("Observing of currencies from webhook unexpectedly failed.");
             }
         }
 
@@ -117,6 +123,7 @@ namespace MonobankExporter.BusinessLogic.Services
             {
                 if (string.IsNullOrWhiteSpace(clientInfo?.Token))
                 {
+                    _logger.LogError($"Could not expose metrics for client: {clientInfo?.Name}. Token is not empty.");
                     return;
                 }
 
@@ -124,6 +131,7 @@ namespace MonobankExporter.BusinessLogic.Services
                 var userInfo = await client.Client.GetClientInfoAsync(stoppingToken);
                 if (!string.IsNullOrWhiteSpace(clientInfo.Name))
                 {
+                    _logger.LogInformation($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
                     userInfo.Name = clientInfo.Name;
                 }
 
@@ -144,11 +152,11 @@ namespace MonobankExporter.BusinessLogic.Services
                         await _redisCacheService.SetRecordAsync(account.Id, cacheRecord, DateTime.UtcNow.AddMinutes(_options.ClientsRefreshTimeInMinutes + 1), stoppingToken);
                     }
                 }
-                LogMessage($"Observed metrics for {userInfo.Name}");
+                _logger.LogInformation($"Observed metrics for {userInfo.Name}");
             }
             catch
             {
-                LogMessage($"Observing of metrics for {clientInfo?.Name} unexpectedly failed.");
+                _logger.LogError($"Observing of metrics for {clientInfo?.Name} unexpectedly failed.");
             }
         }
 
@@ -156,43 +164,36 @@ namespace MonobankExporter.BusinessLogic.Services
         {
             if (string.IsNullOrWhiteSpace(webHookUrl))
             {
-                LogMessage("The webhook url is empty.");
+                _logger.LogWarning("The webhook url is empty.");
 
                 return false;
             }
 
-            LogMessage($"Validating webhook url from configs: {webHookUrl}.");
+            _logger.LogInformation($"Validating webhook url from configs: {webHookUrl}.");
 
             var isUrl = Uri.TryCreate(webHookUrl, UriKind.Absolute, out var uriResult);
             if (!isUrl)
             {
-                LogMessage("The webhook url has bad format.");
+                _logger.LogWarning("The webhook url has bad format.");
 
                 return false;
             }
 
             if (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps)
             {
-                LogMessage("The webhook url does not contain HTTP or HTTPS.");
+                _logger.LogWarning("The webhook url does not contain HTTP or HTTPS.");
 
                 return false;
             }
 
             if (!uriResult.AbsoluteUri.EndsWith("/webhook"))
             {
-                LogMessage("The webhook url does not contain the '/webhook' path.");
+                _logger.LogWarning("The webhook url does not contain the '/webhook' path.");
 
                 return false;
             }
 
-            LogMessage("Webhook url is valid. Webhook and Redis will be used.");
-
             return true;
-        }
-
-        private static void LogMessage(string message)
-        {
-            Console.WriteLine($"[{DateTime.Now}] {message}");
         }
     }
 }
