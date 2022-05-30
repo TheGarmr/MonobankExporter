@@ -178,7 +178,7 @@ namespace MonobankExporter.BusinessLogic.Services
                 return false;
             }
 
-            if (!uriResult.AbsoluteUri.Contains("/webhook"))
+            if (!uriResult.AbsoluteUri.EndsWith("/webhook"))
             {
                 LogMessage("The webhook url does not contain the '/webhook' path.");
 
