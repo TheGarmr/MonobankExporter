@@ -29,7 +29,9 @@ Currencies metrics will be provisioned in any case.<br>
 The client's metrics will be provisioned only in the case of the existing token.<br>
 Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<br>
 
-## Docker-compose example
+# Examples
+
+## Docker-compose with image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter)
 ```yaml
 version: '3.1'
 
@@ -58,6 +60,18 @@ networks:
   exporter-network:
     external: true
 ```
+
+## Docker-compose with image from sources
+Clone repository to your local folder<br>
+`git clone https://github.com/TheGarmr/monobank-exporter.git`<br>
+
+Go to folder with sources<br>
+`cd monobank-exporter`<br>
+
+Edit monobank-exporter.yml in the root folder (you can find an example below)<br>
+
+Compose up!<br>
+`docker-compose up -d`<br>
 
 ## Config file example
 ```yaml
