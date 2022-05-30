@@ -4,6 +4,7 @@ WORKDIR /etc/monobank-exporter
 
 COPY ["Monobank.Core/Monobank.Core.csproj", "Monobank.Core/"]
 COPY ["Monobank.Tests/Monobank.Tests.csproj", "Monobank.Tests/"]
+COPY ["MonobankExporter.BusinessLogic/MonobankExporter.BusinessLogic.csproj", "MonobankExporter.BusinessLogic/"]
 COPY ["MonobankExporter.API/MonobankExporter.API.csproj", "MonobankExporter.API/"]
 
 RUN dotnet restore "MonobankExporter.API/MonobankExporter.API.csproj" --runtime alpine-x64
@@ -13,7 +14,7 @@ RUN dotnet publish "MonobankExporter.API/MonobankExporter.API.csproj" \
     --configuration Release \
     --output /etc/monobank-exporter/publish \
     --no-restore \
-    --no-logo \
+    --nologo \
     --runtime alpine-x64 \
     --self-contained true \
     --verbosity quiet \
