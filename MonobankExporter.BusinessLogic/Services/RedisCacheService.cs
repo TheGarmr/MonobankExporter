@@ -2,9 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
-using MonobankExporter.API.Interfaces;
+using MonobankExporter.BusinessLogic.Interfaces;
 
-namespace MonobankExporter.API.Services
+namespace MonobankExporter.BusinessLogic.Services
 {
     public class RedisCacheService : IRedisCacheService
     {

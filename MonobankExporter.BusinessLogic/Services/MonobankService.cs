@@ -4,11 +4,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Monobank.Core;
 using Monobank.Core.Models;
-using MonobankExporter.API.Interfaces;
-using MonobankExporter.API.Models;
+using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.BusinessLogic.Models;
 using Newtonsoft.Json;
 
-namespace MonobankExporter.API.Services
+namespace MonobankExporter.BusinessLogic.Services
 {
     public class MonobankService : IMonobankService
     {

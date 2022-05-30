@@ -1,8 +1,8 @@
-﻿using System.Threading;
+﻿using Microsoft.Extensions.Caching.Distributed;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
 
-namespace MonobankExporter.API.Services
+namespace MonobankExporter.BusinessLogic.Services
 {
     public class DistributedCacheMock : IDistributedCache
     {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MonobankExporter.API.Interfaces;
-using MonobankExporter.API.Models;
-using MonobankExporter.API.Services;
-using MonobankExporter.API.Workers;
+using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.BusinessLogic.Models;
+using MonobankExporter.BusinessLogic.Services;
+using MonobankExporter.BusinessLogic.Workers;
 using StackExchange.Redis;
 
 namespace MonobankExporter.API.Extensions

@@ -1,6 +1,6 @@
-﻿using MonobankExporter.API.Models;
+﻿using MonobankExporter.BusinessLogic.Models;
 
-namespace MonobankExporter.API.Interfaces
+namespace MonobankExporter.BusinessLogic.Interfaces
 {
     public interface IPrometheusExporterService
     {

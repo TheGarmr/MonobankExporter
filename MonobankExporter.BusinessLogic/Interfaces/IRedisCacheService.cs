@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MonobankExporter.API.Interfaces
+namespace MonobankExporter.BusinessLogic.Interfaces
 {
     public interface IRedisCacheService
     {

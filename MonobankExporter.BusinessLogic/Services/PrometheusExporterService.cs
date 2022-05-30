@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
-using MonobankExporter.API.Interfaces;
-using MonobankExporter.API.Models;
+using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.BusinessLogic.Models;
 using Prometheus;
 
-namespace MonobankExporter.API.Services
+namespace MonobankExporter.BusinessLogic.Services
 {
     public class PrometheusExporterService : IPrometheusExporterService
     {

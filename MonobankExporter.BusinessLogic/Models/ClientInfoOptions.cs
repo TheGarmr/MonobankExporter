@@ -1,4 +1,4 @@
-﻿namespace MonobankExporter.API.Models
+﻿namespace MonobankExporter.BusinessLogic.Models
 {
     public class ClientInfoOptions
     {

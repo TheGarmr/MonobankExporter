@@ -3,10 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MonobankExporter.API.Interfaces;
-using MonobankExporter.API.Models;
+using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.BusinessLogic.Models;
 
-namespace MonobankExporter.API.Workers
+namespace MonobankExporter.BusinessLogic.Workers
 {
     public class BalanceWorker : BackgroundService
     {

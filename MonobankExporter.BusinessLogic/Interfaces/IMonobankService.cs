@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Monobank.Core.Models;
 
-namespace MonobankExporter.API.Interfaces
+namespace MonobankExporter.BusinessLogic.Interfaces
 {
     public interface IMonobankService
     {
