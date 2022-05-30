@@ -33,10 +33,10 @@ namespace MonobankExporter.API
         {
             app.UseRouting();
 
-            app.Map("/metrics", metricsApp =>
+            app.Map("/metrics", metricsEndpoint =>
             {
-                metricsApp.UseBasicAuth();
-                metricsApp.UseMetricServer("");
+                metricsEndpoint.UseBasicAuth();
+                metricsEndpoint.UseMetricServer("");
             });
 
             app.UseEndpoints(endpoints =>
