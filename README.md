@@ -31,6 +31,9 @@ Currencies metrics will be provisioned in any case.<br>
 The client's metrics will be provisioned only in the case of the existing token.<br>
 Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<br>
 
+# Logs
+  * logs are shown at the console and written to file `/var/log/monobank-exporter.log`
+
 # Examples<br>
 
 ## Docker-compose with image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter)
