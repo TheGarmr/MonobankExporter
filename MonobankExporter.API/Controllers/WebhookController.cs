@@ -7,7 +7,7 @@ using MonobankExporter.BusinessLogic.Interfaces;
 namespace MonobankExporter.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("webhook")]
     public class WebhookController : ControllerBase
     {
         private readonly IMonobankService _monobankService;
