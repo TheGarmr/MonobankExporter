@@ -25,15 +25,16 @@ namespace MonobankExporter.BusinessLogic.Workers
         {
             return Task.Run(async () =>
             {
+                var webhookWillBeUsed = WebHookWillBeUsed();
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    await ProcessAsync(stoppingToken);
+                    await ProcessAsync(webhookWillBeUsed, stoppingToken);
                     Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
                 }
             }, stoppingToken);
         }
 
-        private async Task ProcessAsync(CancellationToken cancellationToken)
+        private async Task ProcessAsync(bool webhookWillBeUsed, CancellationToken cancellationToken)
         {
             using var scope = _scopeFactory.CreateScope();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<BalanceWorker>>();
@@ -41,7 +42,6 @@ namespace MonobankExporter.BusinessLogic.Workers
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
-                var webhookWillBeUsed = monobankService.WebHookUrlIsValid(_options.WebhookUrl);
                 if (webhookWillBeUsed)
                 {
                     logger.LogInformation("Webhook url is valid. Webhook and Redis will be used.");
@@ -53,6 +53,13 @@ namespace MonobankExporter.BusinessLogic.Workers
             {
                 logger.LogError($"Balance export unexpectedly failed. Error message: {ex.Message}");
             }
+        }
+
+        private bool WebHookWillBeUsed()
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
+            return monobankService.WebHookUrlIsValid(_options.WebhookUrl);
         }
     }
 }
