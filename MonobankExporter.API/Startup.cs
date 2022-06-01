@@ -18,7 +18,7 @@ namespace MonobankExporter.API
         public void ConfigureServices(IServiceCollection services)
         {
             var logger = Serilog.Log.Logger = services.AddLogger();
-            logger.Information("running monobank-exporter. version 1.1");
+            logger.Information($"running monobank-exporter. version {GetType().Assembly.GetName().Version}");
             services.AddControllers();
             services.AddRedisCache(Configuration);
             services.AddPrometheusExporter();
