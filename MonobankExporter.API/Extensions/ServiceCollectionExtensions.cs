@@ -76,7 +76,7 @@ namespace MonobankExporter.API.Extensions
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Information()
                 .WriteTo.Console()
-                .WriteTo.File("/var/log/monobank-exporter.log", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("/var/log/monobank-exporter.log")
                 .CreateLogger();
         }
     }
