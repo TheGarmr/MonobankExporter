@@ -11,8 +11,6 @@ services:
       - "27000:80"
     volumes:
       - ./monobank-exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
-    environment:
-      - TZ=Europe/Kiev
 
   redis:
     image: redis:latest

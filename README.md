@@ -47,8 +47,6 @@ services:
     restart: always
     volumes:
       - ./monobank-exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
-    environment:
-      - TZ=Europe/Kiev
     depends_on:
       - monobank-exporter-redis
     networks:
@@ -112,3 +110,5 @@ basic-auth:
 
 # What's new
   * 1.1 - Added ability to set up basic auth for the `metrics` endpoint
+  * 1.2 - Added Serilog as logger, cleanup a lot of useless commands
+  * 1.3 - Changed timezone to Europe/Kiev at alpine image. Changed logs filenaming

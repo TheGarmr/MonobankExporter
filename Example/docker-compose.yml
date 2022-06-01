@@ -46,8 +46,6 @@ services:
       - monitoring
     volumes:
       - ./configs/exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
-    environment:
-      - TZ=Europe/Kiev
     depends_on:
       - redis
 
