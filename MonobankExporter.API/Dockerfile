@@ -3,7 +3,6 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS publish
 WORKDIR /etc/monobank-exporter
 
 COPY ["Monobank.Core/Monobank.Core.csproj", "Monobank.Core/"]
-COPY ["Monobank.Tests/Monobank.Tests.csproj", "Monobank.Tests/"]
 COPY ["MonobankExporter.BusinessLogic/MonobankExporter.BusinessLogic.csproj", "MonobankExporter.BusinessLogic/"]
 COPY ["MonobankExporter.API/MonobankExporter.API.csproj", "MonobankExporter.API/"]
 
