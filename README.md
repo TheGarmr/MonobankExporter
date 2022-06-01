@@ -33,6 +33,7 @@ Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<
 
 # Logs
   * logs are shown at the console and written to file `/var/log/monobank-exporter.log`
+  * currently image creates a directory on logs path. The only solution for today I have is to create a log file and give all permissions to it
 
 # Examples<br>
 

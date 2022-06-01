@@ -72,6 +72,7 @@ namespace MonobankExporter.API.Extensions
 
         internal static ILogger AddLogger(this IServiceCollection services)
         {
+            // ToDo: fix permissions
             return new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Information()
