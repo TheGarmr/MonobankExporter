@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MonobankExporter.API.Extensions;
 using Prometheus;
-using Serilog;
 
 namespace MonobankExporter.API
 {
@@ -18,7 +17,7 @@ namespace MonobankExporter.API
         
         public void ConfigureServices(IServiceCollection services)
         {
-            var logger = Log.Logger = services.AddLogger();
+            var logger = Serilog.Log.Logger = services.AddLogger();
             logger.Information("running monobank-exporter. version 1.1");
             services.AddControllers();
             services.AddRedisCache(Configuration);
