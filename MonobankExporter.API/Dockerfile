@@ -26,7 +26,7 @@ RUN dotnet publish "MonobankExporter.API/MonobankExporter.API.csproj" \
 
 FROM mcr.microsoft.com/dotnet/runtime-deps:5.0-alpine AS final
 
-RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime
+RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime && apk upgrade musl
 
 RUN adduser --disabled-password \
   --home /app \
