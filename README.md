@@ -6,7 +6,7 @@
 ### Functionality
   * Publish currencies metrics
   * Publish a client's balance and credit limit for each card as metrics
-  * You can use your own name different from that stored in the bank
+  * You can use your name different from that stored in the bank
   * basic auth to the metrics endpoint
 
 ### API limitations:
@@ -33,7 +33,7 @@ Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<
 
 # Logs
   * logs are shown at the console and written to file `/var/log/monobank-exporter.log`
-  * currently image is not able to create the log file by himself. you need to create a log file by yourself. if anyone knows how to fix this - I will be open for communication
+  * currently image is not able to create the log file by himself. you need to create a log file by yourself. if anyone knows how to fix this - I will be open to communication
 
 # Examples<br/>
 
@@ -65,9 +65,9 @@ networks:
     external: true
 ```
 
-## Docker-compose with image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter) with Grafana and Prometheus
+## Docker-compose with the image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter) with Grafana and Prometheus
 You can find this example in the `Example` folder<br/>
-Clone repository to your local folder<br/>
+Clone the repository to your local folder<br/>
 `git clone https://github.com/TheGarmr/monobank-exporter.git`<br/>
 
 Go to folder with sources<br/>
@@ -78,8 +78,8 @@ Edit monobank-exporter.yml in the root folder (you can find an example below)<br
 Compose up!<br/>
 `docker-compose up -d`<br/>
 
-## Docker-compose with image from sources
-Clone repository to your local folder<br/>
+## Docker-compose with images from sources
+Clone the repository to your local folder<br/>
 `git clone https://github.com/TheGarmr/monobank-exporter.git`<br/>
 
 Go to folder with sources<br/>
@@ -108,13 +108,12 @@ basic-auth:
   username: "admin"
   password: "admin"
 ```
-
 # What's new
   * 1.1 - Added ability to set up basic auth for the `metrics` endpoint.
-  * 1.2 - Added Serilog as logger, cleanup a lot of useless commands.
-  * 1.3 - Changed timezone to Europe/Kiev at alpine image. Changed logs file naming.
-  * 1.4 - Fix of wrong behavior for webhooks setting and renundant logs.<br/>
-          Switched from root user to nonroot at the Dockerfile.<br/>
-          Added GET endpoint for webhook controller to avoid any possible problems with webhooks setting. According to the documentation the provided url should respond with 200 status.<br/>
+  * 1.2 - Added Serilog as a logger and cleaned up a lot of useless commands.
+  * 1.3 - Changed timezone to Europe/Kiev at the alpine image. Changed logs file naming.
+  * 1.4 - Fix wrong behavior for webhooks setting and redundant logs.<br/>
+          Switched from root user to non-root at the Dockerfile.<br/>
+          Added GET endpoint for the webhook controller to avoid any possible problems with webhooks setting. According to the documentation, the provided URL should respond with 200 status.<br/>
           Added upgrading of musl at the image to avoid all vulnerabilities.<br/>
           Added some labels to the Dockerfile.<br/>
