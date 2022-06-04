@@ -12,54 +12,53 @@ namespace MonobankExporter.BusinessLogic.Workers
     public class BalanceWorker : BackgroundService
     {
         private readonly MonobankExporterOptions _options;
-        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IMonobankService _monobankService;
+        private readonly ILogger<BalanceWorker> _logger;
 
         public BalanceWorker(MonobankExporterOptions options,
             IServiceScopeFactory scopeFactory)
         {
             _options = options;
-            _scopeFactory = scopeFactory;
+            var scope = scopeFactory.CreateScope();
+            _logger = scope.ServiceProvider.GetRequiredService<ILogger<BalanceWorker>>();
+            _monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             return Task.Run(async () =>
             {
-                var webhookWillBeUsed = WebHookWillBeUsed();
+                var webhookWillBeUsed = await WebHookWillBeUsed(stoppingToken);
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    await ProcessAsync(webhookWillBeUsed, stoppingToken);
+                    try
+                    {
+                        stoppingToken.ThrowIfCancellationRequested();
+                        await _monobankService.ExportUsersMetrics(webhookWillBeUsed, stoppingToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogInformation("Stopping balance metrics export");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Balance export unexpectedly failed. Error message: {ex.Message}");
+                    }
+
                     Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
                 }
             }, stoppingToken);
         }
 
-        private async Task ProcessAsync(bool webhookWillBeUsed, CancellationToken cancellationToken)
+        private async Task<bool> WebHookWillBeUsed(CancellationToken cancellationToken)
         {
-            using var scope = _scopeFactory.CreateScope();
-            var logger = scope.ServiceProvider.GetRequiredService<ILogger<BalanceWorker>>();
-            try
+            var webhookWillBeUsed = _monobankService.WebHookUrlIsValid(_options.WebhookUrl);
+            if (webhookWillBeUsed)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                var monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
-                if (webhookWillBeUsed)
-                {
-                    logger.LogInformation("Webhook url is valid. Webhook and Redis will be used.");
-                    await monobankService.SetupWebHookForUsers(_options.WebhookUrl, cancellationToken);
-                }
-                await monobankService.ExportUsersMetrics(webhookWillBeUsed, cancellationToken);
+                _logger.LogInformation("Webhook url is valid. Webhook and Redis will be used.");
+                await _monobankService.SetupWebHookForUsers(_options.WebhookUrl, cancellationToken);
             }
-            catch (Exception ex)
-            {
-                logger.LogError($"Balance export unexpectedly failed. Error message: {ex.Message}");
-            }
-        }
-
-        private bool WebHookWillBeUsed()
-        {
-            using var scope = _scopeFactory.CreateScope();
-            var monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
-            return monobankService.WebHookUrlIsValid(_options.WebhookUrl);
+            return webhookWillBeUsed;
         }
     }
 }
