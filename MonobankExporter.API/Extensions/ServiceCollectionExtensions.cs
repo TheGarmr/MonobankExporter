@@ -45,7 +45,7 @@ namespace MonobankExporter.API.Extensions
 
         internal static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
         {
-            //services.AddHostedService<BalanceWorker>();
+            services.AddHostedService<BalanceWorker>();
             services.AddHostedService<CurrenciesWorker>();
             return services;
         }
