@@ -28,6 +28,12 @@ FROM mcr.microsoft.com/dotnet/runtime-deps:5.0-alpine AS final
 
 RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime
 
+RUN adduser --disabled-password \
+  --home /app \
+  --gecos '' dotnetuser && chown -R dotnetuser /app
+
+USER dotnetuser
+
 WORKDIR /etc/monobank-exporter
 EXPOSE 80
 COPY --from=publish /etc/monobank-exporter/publish .
