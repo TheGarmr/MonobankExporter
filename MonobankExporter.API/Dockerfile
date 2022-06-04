@@ -30,9 +30,11 @@ RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime && apk u
 
 RUN adduser --disabled-password \
   --home /app \
-  --gecos '' dotnetuser && chown -R dotnetuser /app
+  --gecos '' monobankuser && chown -R monobankuser /app
 
-USER dotnetuser
+RUN touch /var/log/monobank-exporter.log && chown -R monobankuser:monobankuser /var/log/monobank-exporter.log
+
+USER monobankuser
 
 WORKDIR /etc/monobank-exporter
 EXPOSE 80

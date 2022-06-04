@@ -22,10 +22,4 @@
 		<ProjectReference Include="..\MonobankExporter.BusinessLogic\MonobankExporter.BusinessLogic.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<None Update="monobank-exporter.yml">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
 </Project>
