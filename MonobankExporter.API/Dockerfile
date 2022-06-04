@@ -1,5 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS publish
 
+LABEL version="1.4"
+LABEL maintainer=TheGarmr
+LABEL url=https://github.com/TheGarmr/monobank-exporter
+
 WORKDIR /etc/monobank-exporter
 
 COPY ["Monobank.Core/Monobank.Core.csproj", "Monobank.Core/"]
