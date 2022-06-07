@@ -20,10 +20,9 @@ namespace Monobank.Core.Services
         private readonly HttpClient _httpClient;
         private DateTime _previousRequestTimestamp = DateTime.UtcNow.AddSeconds(-RequestLimit);
 
-        public MonobankServiceClient(HttpClient client, string token)
+        public MonobankServiceClient(HttpClient client)
         {
             _httpClient = client;
-            _httpClient.DefaultRequestHeaders.Add(TokenHeader, token);
         }
 
         public async Task<UserInfo> GetClientInfoAsync(string token, CancellationToken cancellationToken)
@@ -66,8 +65,11 @@ namespace Monobank.Core.Services
             return JsonSerializer.Deserialize<ICollection<Statement>>(responseString);
         }
 
-        public async Task<bool> SetWebhookAsync(string url, CancellationToken stoppingToken)
+        public async Task<bool> SetWebhookAsync(string url, string token, CancellationToken stoppingToken)
         {
+            _httpClient.DefaultRequestHeaders.Remove(TokenHeader);
+            _httpClient.DefaultRequestHeaders.Add(TokenHeader, token);
+
             // create body containing webhook url
             var body = JsonSerializer.Serialize(new { webHookUrl = url });
             // uri to call
@@ -76,11 +78,6 @@ namespace Monobank.Core.Services
             var response = await _httpClient.PostAsync(uri, new StringContent(body), stoppingToken);
 
             return response.IsSuccessStatusCode;
-        }
-
-        public async Task<bool> SetWebhookAsync(string url)
-        {
-            return await SetWebhookAsync(url, CancellationToken.None);
         }
     }
 }

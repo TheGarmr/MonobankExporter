@@ -10,8 +10,7 @@ namespace Monobank.Tests
         [SetUp]
         public void Setup()
         {
-            var config = Configuration.InitConfiguration();
-            Instance = new MonoClient(config["ApiKey"]);
+            Instance = new MonoClient();
         }
     }
 }

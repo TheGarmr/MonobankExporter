@@ -13,7 +13,7 @@ namespace Monobank.Core
         public MonobankCurrencyClient Currency { get; }
         public MonobankServiceClient Client { get; }
 
-        public MonoClient(string token = "")
+        public MonoClient()
         {
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Clear();
@@ -21,7 +21,7 @@ namespace Monobank.Core
             httpClient.BaseAddress = new Uri(BaseApiUrl);
 
             Currency = new MonobankCurrencyClient(httpClient);
-            Client = new MonobankServiceClient(httpClient, token);
+            Client = new MonobankServiceClient(httpClient);
         }
     }
 }

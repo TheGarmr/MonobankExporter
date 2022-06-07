@@ -28,13 +28,13 @@ namespace MonobankExporter.BusinessLogic.Workers
         {
             return Task.Run(async () =>
             {
-                var webhookWillBeUsed = await WebHookWillBeUsed(stoppingToken);
+                var webHookWasSet = await SetupWebHook(stoppingToken);
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     try
                     {
                         stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportUsersMetrics(webhookWillBeUsed, stoppingToken);
+                        await _monobankService.ExportUsersMetrics(webHookWasSet, stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {
@@ -50,14 +50,15 @@ namespace MonobankExporter.BusinessLogic.Workers
             }, stoppingToken);
         }
 
-        private async Task<bool> WebHookWillBeUsed(CancellationToken cancellationToken)
+        private async Task<bool> SetupWebHook(CancellationToken cancellationToken)
         {
             var webhookWillBeUsed = _monobankService.WebHookUrlIsValid(_options.WebhookUrl);
             if (webhookWillBeUsed)
             {
-                _logger.LogInformation("Webhook url is valid. Webhook and Redis will be used.");
-                await _monobankService.SetupWebHookForUsers(_options.WebhookUrl, cancellationToken);
+                _logger.LogInformation("Webhook url is valid. Trying to setup it.");
+                await _monobankService.SetupWebHookForUsers(_options.WebhookUrl, _options.Clients, cancellationToken);
             }
+
             return webhookWillBeUsed;
         }
     }

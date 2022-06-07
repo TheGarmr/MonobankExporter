@@ -20,7 +20,7 @@ namespace MonobankExporter.API
             var logger = Serilog.Log.Logger = services.AddLogger();
             logger.Information($"running monobank-exporter. version {GetType().Assembly.GetName().Version}");
             services.AddControllers();
-            services.AddRedisCache(Configuration);
+            services.AddCache();
             services.AddMetricsExporters();
             services.AddMonobankExporterOptions(Configuration);
             services.AddMonobankService();

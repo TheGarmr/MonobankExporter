@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Monobank.Core;
 using Monobank.Core.Models;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Models;
-using Newtonsoft.Json;
 
 namespace MonobankExporter.BusinessLogic.Services
 {
@@ -15,37 +16,47 @@ namespace MonobankExporter.BusinessLogic.Services
     {
         private readonly MonoClient _client;
         private readonly MonobankExporterOptions _options;
-        private readonly IRedisCacheService _redisCacheService;
+        private readonly ILookupsMemoryCache _cacheService;
         private readonly IMetricsExporterService _metricsExporter;
         private readonly ILogger<MonobankService> _logger;
+        private readonly MemoryCacheEntryOptions _cacheOptions;
 
         public MonobankService(MonobankExporterOptions options,
             IMetricsExporterService metricsExporterService,
-            IRedisCacheService redisCacheService,
+            ILookupsMemoryCache cacheService,
             ILogger<MonobankService> logger)
         {
             _client = new MonoClient();
             _options = options;
             _metricsExporter = metricsExporterService;
-            _redisCacheService = redisCacheService;
+            _cacheService = cacheService;
             _logger = logger;
+            _cacheOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(options.ClientsRefreshTimeInMinutes + 1)
+            };
         }
 
-        public async Task ExportUsersMetrics(bool webhookWillBeUsed, CancellationToken stoppingToken)
+        public async Task ExportUsersMetrics(bool storeToCache, CancellationToken stoppingToken)
         {
             foreach (var clientInfo in _options.Clients)
             {
-                await ExportMetricsForUser(webhookWillBeUsed, clientInfo, stoppingToken);
+                await ExportMetricsForUser(storeToCache, clientInfo, stoppingToken);
             }
         }
 
-        public async Task SetupWebHookForUsers(string webHookUrl, CancellationToken stoppingToken)
+        public async Task SetupWebHookForUsers(string webHookUrl, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
         {
+            if (clients == null || !clients.Any())
+            {
+                return;
+            }
+
             try
             {
-                foreach (var client in _options.Clients.Select(clientInfo => new MonoClient(clientInfo.Token)))
+                foreach (var client in clients)
                 {
-                    await client.Client.SetWebhookAsync(webHookUrl, stoppingToken);
+                    await _client.Client.SetWebhookAsync(webHookUrl, client.Token, stoppingToken);
                 }
 
                 _logger.LogInformation("The setup of the webhook was successful.");
@@ -88,7 +99,7 @@ namespace MonobankExporter.BusinessLogic.Services
             }
         }
 
-        public async Task ExportMetricsForWebHook(WebHookModel webhook, CancellationToken stoppingToken)
+        public void ExportMetricsForWebHook(WebHookModel webhook, CancellationToken stoppingToken)
         {
             _logger.LogInformation($"A webHook received. Card: {webhook?.Data?.Account}...");
             try
@@ -99,13 +110,9 @@ namespace MonobankExporter.BusinessLogic.Services
                     return;
                 }
 
-                var cacheRecord = await _redisCacheService.GetRecordAsync(webhook.Data.Account, stoppingToken);
-
-                var accountInfo = JsonConvert.DeserializeObject<AccountInfoModel>(cacheRecord);
-                if (accountInfo == null)
+                if (!_cacheService.TryGetValue(CacheType.AccountInfo, webhook.Data.Account, out AccountInfoModel accountInfo))
                 {
                     _logger.LogWarning($"The cache doesn't contain a record with account info. Metrics won't be exposed. Card: {webhook.Data.Account}...");
-                    return;
                 }
 
                 _metricsExporter.ObserveAccount(accountInfo, webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit);
@@ -117,7 +124,7 @@ namespace MonobankExporter.BusinessLogic.Services
             }
         }
 
-        private async Task ExportMetricsForUser(bool webHookWillBeUsed, ClientInfoOptions clientInfo, CancellationToken stoppingToken)
+        private async Task ExportMetricsForUser(bool storeToCache, ClientInfoOptions clientInfo, CancellationToken stoppingToken)
         {
             try
             {
@@ -126,7 +133,7 @@ namespace MonobankExporter.BusinessLogic.Services
                     _logger.LogError($"Could not expose metrics for client: {clientInfo?.Name}. Token is empty.");
                     return;
                 }
-                
+
                 var userInfo = await _client.Client.GetClientInfoAsync(clientInfo.Token, stoppingToken);
                 if (!string.IsNullOrWhiteSpace(clientInfo.Name))
                 {
@@ -143,12 +150,11 @@ namespace MonobankExporter.BusinessLogic.Services
                         CardType = account.Type.ToString(),
                         CreditLimit = account.CreditLimitAsMoney
                     };
-                    var cacheRecord = JsonConvert.SerializeObject(accountInfo);
-                    _metricsExporter.ObserveAccount(accountInfo, account.BalanceWithoutCreditLimit);
 
-                    if (webHookWillBeUsed)
+                    _metricsExporter.ObserveAccount(accountInfo, account.BalanceWithoutCreditLimit);
+                    if (storeToCache)
                     {
-                        await _redisCacheService.SetRecordAsync(account.Id, cacheRecord, DateTime.UtcNow.AddMinutes(_options.ClientsRefreshTimeInMinutes + 1), stoppingToken);
+                        _cacheService.Set(CacheType.AccountInfo, account.Id, accountInfo, _cacheOptions);
                     }
                 }
                 _logger.LogInformation($"Observed metrics for {userInfo.Name}");
@@ -181,6 +187,13 @@ namespace MonobankExporter.BusinessLogic.Services
             if (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps)
             {
                 _logger.LogWarning("The webhook url does not contain HTTP or HTTPS.");
+
+                return false;
+            }
+
+            if (!uriResult.AbsoluteUri.Contains("."))
+            {
+                _logger.LogWarning("The webhook url does not dot in the address. It seems like it's not a domain.");
 
                 return false;
             }
