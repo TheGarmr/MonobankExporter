@@ -5,7 +5,7 @@ using Prometheus;
 
 namespace MonobankExporter.BusinessLogic.Services
 {
-    public class PrometheusExporterService : IPrometheusExporterService
+    public class PrometheusExporterService : IMetricsExporterService
     {
         private readonly Gauge _balanceGauge = Metrics.CreateGauge("monobank_balance", "shows current balance", new GaugeConfiguration
         {

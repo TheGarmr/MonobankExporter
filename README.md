@@ -24,7 +24,6 @@
   * minimal request time for currencies info is 10 minutes
   * use HTTP or HTTPS for webhook only
   * `/webhook` ending is mandatory
-  * a Redis instance is mandatory if you will use webhooks.
   * basic auth is not required. it can be added from the config
 
 Currencies metrics will be provisioned in any case.<br/>
@@ -48,21 +47,6 @@ services:
     restart: always
     volumes:
       - ./monobank-exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
-    depends_on:
-      - monobank-exporter-redis
-    networks:
-      - exporter-network
-
-  redis:
-    image: redis:latest
-    container_name: monobank-exporter-redis
-    restart: always
-    networks:
-      - exporter-network
-
-networks:
-  exporter-network:
-    external: true
 ```
 
 ## Docker-compose with the image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter) with Grafana and Prometheus
@@ -101,9 +85,6 @@ monobank-exporter:
   webhookUrl: "http://yourUrl/webhook"
   clientsRefreshTimeInMinutes: 60
   currenciesRefreshTimeInMinutes: 720
-redis:
-  host: "monobank-exporter-redis"
-  port: "6379"
 basic-auth:
   username: "admin"
   password: "admin"

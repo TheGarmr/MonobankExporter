@@ -25,7 +25,7 @@ namespace Monobank.Tests
         [Test]
         public async Task GetClientInfo()
         {
-            var client = await Instance.Client.GetClientInfoAsync();
+            var client = await Instance.Client.GetClientInfoAsync(string.Empty, CancellationToken.None);
             Assert.IsNotNull(client);
             Assert.IsNotEmpty(client.Accounts);
             Assert.IsFalse(string.IsNullOrEmpty(client.Name));

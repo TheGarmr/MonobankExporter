@@ -10,18 +10,18 @@ namespace Monobank.Core
         private const string BaseApiUrl = "https://api.monobank.ua/";
         private const string ResponseMediaType = "application/json";
 
-        public CurrencyService Currency { get; }
-        public ClientService Client { get; }
+        public MonobankCurrencyClient Currency { get; }
+        public MonobankServiceClient Client { get; }
 
-        public MonoClient(string token = "")
+        public MonoClient()
         {
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(ResponseMediaType));
             httpClient.BaseAddress = new Uri(BaseApiUrl);
 
-            Currency = new CurrencyService(httpClient);
-            Client = new ClientService(httpClient, token);
+            Currency = new MonobankCurrencyClient(httpClient);
+            Client = new MonobankServiceClient(httpClient);
         }
     }
 }
