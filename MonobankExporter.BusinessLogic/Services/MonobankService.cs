@@ -50,6 +50,7 @@ namespace MonobankExporter.BusinessLogic.Services
         {
             if (clients == null || !clients.Any())
             {
+                _logger.LogWarning("List of clients is empty. Webhook could not be set.");
                 return;
             }
 
