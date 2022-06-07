@@ -6,7 +6,7 @@
 ### Functionality
   * Publish currencies metrics
   * Publish a client's balance and credit limit for each card as metrics
-  * You can use your own name different from that stored in the bank
+  * You can use your name different from that stored in the bank
   * basic auth to the metrics endpoint
 
 ### API limitations:
@@ -24,18 +24,17 @@
   * minimal request time for currencies info is 10 minutes
   * use HTTP or HTTPS for webhook only
   * `/webhook` ending is mandatory
-  * a Redis instance is mandatory if you will use webhooks.
   * basic auth is not required. it can be added from the config
 
-Currencies metrics will be provisioned in any case.<br>
-The client's metrics will be provisioned only in the case of the existing token.<br>
-Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<br>
+Currencies metrics will be provisioned in any case.<br/>
+The client's metrics will be provisioned only in the case of the existing token.<br/>
+Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<br/>
 
 # Logs
   * logs are shown at the console and written to file `/var/log/monobank-exporter.log`
-  * currently image creates a directory on logs path. The only solution for today I have is to create a log file and give all permissions to it
+  * currently image is not able to create the log file by himself. you need to create a log file by yourself. if anyone knows how to fix this - I will be open to communication
 
-# Examples<br>
+# Examples<br/>
 
 ## Docker-compose with image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter)
 ```yaml
@@ -48,47 +47,32 @@ services:
     restart: always
     volumes:
       - ./monobank-exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
-    depends_on:
-      - monobank-exporter-redis
-    networks:
-      - exporter-network
-
-  redis:
-    image: redis:latest
-    container_name: monobank-exporter-redis
-    restart: always
-    networks:
-      - exporter-network
-
-networks:
-  exporter-network:
-    external: true
 ```
 
-## Docker-compose with image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter) with Grafana and Prometheus
-You can find this example in the `Example` folder<br>
-Clone repository to your local folder<br>
-`git clone https://github.com/TheGarmr/monobank-exporter.git`<br>
+## Docker-compose with the image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter) with Grafana and Prometheus
+You can find this example in the `Example` folder<br/>
+Clone the repository to your local folder<br/>
+`git clone https://github.com/TheGarmr/monobank-exporter.git`<br/>
 
-Go to folder with sources<br>
-`cd monobank-exporter/Example`<br>
+Go to folder with sources<br/>
+`cd monobank-exporter/Example`<br/>
 
-Edit monobank-exporter.yml in the root folder (you can find an example below)<br>
+Edit monobank-exporter.yml in the root folder (you can find an example below)<br/>
 
-Compose up!<br>
-`docker-compose up -d`<br>
+Compose up!<br/>
+`docker-compose up -d`<br/>
 
-## Docker-compose with image from sources
-Clone repository to your local folder<br>
-`git clone https://github.com/TheGarmr/monobank-exporter.git`<br>
+## Docker-compose with images from sources
+Clone the repository to your local folder<br/>
+`git clone https://github.com/TheGarmr/monobank-exporter.git`<br/>
 
-Go to folder with sources<br>
-`cd monobank-exporter`<br>
+Go to folder with sources<br/>
+`cd monobank-exporter`<br/>
 
-Edit monobank-exporter.yml in the root folder (you can find an example below)<br>
+Edit monobank-exporter.yml in the root folder (you can find an example below)<br/>
 
-Compose up!<br>
-`docker-compose up -d`<br>
+Compose up!<br/>
+`docker-compose up -d`<br/>
 
 ## Config file example
 ```yaml
@@ -101,15 +85,17 @@ monobank-exporter:
   webhookUrl: "http://yourUrl/webhook"
   clientsRefreshTimeInMinutes: 60
   currenciesRefreshTimeInMinutes: 720
-redis:
-  host: "monobank-exporter-redis"
-  port: "6379"
 basic-auth:
   username: "admin"
   password: "admin"
 ```
-
 # What's new
-  * 1.1 - Added ability to set up basic auth for the `metrics` endpoint
-  * 1.2 - Added Serilog as logger, cleanup a lot of useless commands
-  * 1.3 - Changed timezone to Europe/Kiev at alpine image. Changed logs filenaming
+  * v1.1 - Added ability to set up basic auth for the `metrics` endpoint.
+  * v1.2 - Added Serilog as a logger and cleaned up a lot of useless commands.
+  * v1.3 - Changed timezone to Europe/Kiev at the alpine image. Changed logs file naming.
+  * v1.4 - Fix wrong behavior for webhooks setting and redundant logs.<br/>
+           Switched from root user to non-root at the Dockerfile.<br/>
+           Added GET endpoint for the webhook controller to avoid any possible problems with webhooks setting. According to the documentation, the provided URL should respond with 200 status.<br/>
+           Added upgrading of musl at the image to avoid all vulnerabilities.<br/>
+           Added some labels to the Dockerfile.<br/>
+  * v1.5 - Removed Redis dependency with IMemoryCache. Small refactoring of library for monobank client

@@ -1,5 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS publish
 
+LABEL version="1.4"
+LABEL maintainer=TheGarmr
+LABEL url=https://github.com/TheGarmr/monobank-exporter
+
 WORKDIR /etc/monobank-exporter
 
 COPY ["Monobank.Core/Monobank.Core.csproj", "Monobank.Core/"]
@@ -22,7 +26,15 @@ RUN dotnet publish "MonobankExporter.API/MonobankExporter.API.csproj" \
 
 FROM mcr.microsoft.com/dotnet/runtime-deps:5.0-alpine AS final
 
-RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime
+RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime && apk upgrade musl
+
+RUN adduser --disabled-password \
+  --home /app \
+  --gecos '' monobankuser && chown -R monobankuser /app
+
+RUN touch /var/log/monobank-exporter.log && chown -R monobankuser:monobankuser /var/log/monobank-exporter.log
+
+USER monobankuser
 
 WORKDIR /etc/monobank-exporter
 EXPOSE 80

@@ -16,7 +16,6 @@ services:
     depends_on:
       - prometheus
       - exporter
-      - redis
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=12345
@@ -36,7 +35,6 @@ services:
       - '--web.enable-lifecycle'
     depends_on:
       - exporter
-      - redis
 
   exporter:
     image: thegarmr/monobank-exporter:latest
@@ -46,15 +44,6 @@ services:
       - monitoring
     volumes:
       - ./configs/exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
-    depends_on:
-      - redis
-
-  redis:
-    image: redis:latest
-    container_name: monobank-exporter-redis
-    restart: always
-    networks:
-      - monitoring
 
 networks:
   monitoring:

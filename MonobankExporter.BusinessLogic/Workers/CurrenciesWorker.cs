@@ -12,13 +12,16 @@ namespace MonobankExporter.BusinessLogic.Workers
     public class CurrenciesWorker : BackgroundService
     {
         private readonly MonobankExporterOptions _options;
-        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IMonobankService _monobankService;
+        private readonly ILogger<CurrenciesWorker> _logger;
 
         public CurrenciesWorker(MonobankExporterOptions options,
             IServiceScopeFactory scopeFactory)
         {
             _options = options;
-            _scopeFactory = scopeFactory;
+            var scope = scopeFactory.CreateScope();
+            _logger = scope.ServiceProvider.GetRequiredService<ILogger<CurrenciesWorker>>();
+            _monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -27,26 +30,23 @@ namespace MonobankExporter.BusinessLogic.Workers
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    await ProcessAsync(stoppingToken);
+                    try
+                    {
+                        stoppingToken.ThrowIfCancellationRequested();
+                        await _monobankService.ExportCurrenciesMetrics(stoppingToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogInformation("Stopping currencies metrics export");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Currencies export unexpectedly failed. Error message: {ex.Message}");
+                    }
+
                     Thread.Sleep(TimeSpan.FromMinutes(_options.CurrenciesRefreshTimeInMinutes));
                 }
             }, stoppingToken);
-        }
-
-        private async Task ProcessAsync(CancellationToken cancellationToken)
-        {
-            using var scope = _scopeFactory.CreateScope();
-            var logger = scope.ServiceProvider.GetRequiredService<ILogger<BalanceWorker>>();
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                var monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
-                await monobankService.ExportCurrenciesMetrics(cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError($"Currencies export unexpectedly failed. Error message: {ex.Message}");
-            }
         }
     }
 }

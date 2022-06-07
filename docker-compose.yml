@@ -11,8 +11,3 @@ services:
       - "27000:80"
     volumes:
       - ./monobank-exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
-
-  redis:
-    image: redis:latest
-    container_name: monobank-exporter-redis
-    restart: always

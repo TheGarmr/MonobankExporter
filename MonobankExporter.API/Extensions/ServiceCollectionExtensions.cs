@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Models;
@@ -7,39 +6,20 @@ using MonobankExporter.BusinessLogic.Services;
 using MonobankExporter.BusinessLogic.Workers;
 using Serilog;
 using Serilog.Events;
-using StackExchange.Redis;
 
 namespace MonobankExporter.API.Extensions
 {
     internal static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddRedisCache(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddCache(this IServiceCollection services)
         {
-            services.AddTransient<IRedisCacheService, RedisCacheService>();
-            var redisOptions = configuration.GetSection("redis").Get<RedisOptions>();
-            if (redisOptions != null && !string.IsNullOrWhiteSpace(redisOptions.Host) && !string.IsNullOrWhiteSpace(redisOptions.Port))
-            {
-                services.AddStackExchangeRedisCache(options =>
-                {
-                    options.InstanceName = "MonobankExporter";
-                    options.ConfigurationOptions = new ConfigurationOptions
-                    {
-                        EndPoints = { redisOptions.Host, redisOptions.Port },
-                        AbortOnConnectFail = false
-                    };
-                });
-            }
-            else
-            {
-                services.Add(ServiceDescriptor.Singleton<IDistributedCache, DistributedCacheMock>());
-            }
-
+            services.AddSingleton<ILookupsMemoryCache, LookupsMemoryCache>();
             return services;
         }
 
-        internal static IServiceCollection AddPrometheusExporter(this IServiceCollection services)
+        internal static IServiceCollection AddMetricsExporters(this IServiceCollection services)
         {
-            services.AddSingleton<IPrometheusExporterService, PrometheusExporterService>();
+            services.AddSingleton<IMetricsExporterService, PrometheusExporterService>();
             return services;
         }
 
@@ -72,7 +52,6 @@ namespace MonobankExporter.API.Extensions
 
         internal static ILogger AddLogger(this IServiceCollection services)
         {
-            // ToDo: fix permissions
             return new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Information()
