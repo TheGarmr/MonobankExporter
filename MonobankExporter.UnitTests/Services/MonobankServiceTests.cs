@@ -1,32 +1,36 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Monobank.Core.Models;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Models;
 using MonobankExporter.BusinessLogic.Services;
 using Moq;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace MonobankExporter.UnitTests.Services
 {
     public class MonobankServiceTests
     {
-        private readonly Mock<IPrometheusExporterService> _prometheusServiceMock;
-        private readonly Mock<IRedisCacheService> _redisCacheServiceMock;
+        private readonly Mock<IMetricsExporterService> _metricsExporterMock;
+        private readonly Mock<ILookupsMemoryCache> _cacheServiceMock;
+        private readonly Mock<ILogger<MonobankService>> _loggerMock;
+
+        private AccountInfoModel _tryGetResult = null;
 
         public MonobankServiceTests()
         {
-            _prometheusServiceMock = new Mock<IPrometheusExporterService>();
-            _redisCacheServiceMock = new Mock<IRedisCacheService>();
+            _metricsExporterMock = new Mock<IMetricsExporterService>();
+            _cacheServiceMock = new Mock<ILookupsMemoryCache>();
+            _loggerMock = new Mock<ILogger<MonobankService>>();
         }
 
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        //[InlineData("http://asd/webhook")]
-        //[InlineData("https://asd/webhook")]
+        [InlineData("http://asd/webhook")]
+        [InlineData("https://asd/webhook")]
         [InlineData("ftp://asd/webhook")]
         [InlineData("sftp://asd/webhook")]
         [InlineData("http://example.com/webhooks")]
@@ -59,21 +63,21 @@ namespace MonobankExporter.UnitTests.Services
         }
 
         [Fact]
-        public async Task ExportMetricsForWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfModelIsNull()
+        public void ExportMetricsForWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfModelIsNull()
         {
             // Arrange
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForWebHook(null, CancellationToken.None);
+            service.ExportMetricsForWebHook(null, CancellationToken.None);
 
             // Assert
-            _prometheusServiceMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
-            _redisCacheServiceMock.Verify(x => x.GetRecordAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
+            _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
         }
 
         [Fact]
-        public async Task ExportMetricsForWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfDataIsNull()
+        public void ExportMetricsForWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfDataIsNull()
         {
             // Arrange
             var webhook = new WebHookModel
@@ -83,15 +87,15 @@ namespace MonobankExporter.UnitTests.Services
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForWebHook(webhook, CancellationToken.None);
+            service.ExportMetricsForWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _prometheusServiceMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
-            _redisCacheServiceMock.Verify(x => x.GetRecordAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
+            _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
         }
 
         [Fact]
-        public async Task ExportMetricsForWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfAccountIsNull()
+        public void ExportMetricsForWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfAccountIsNull()
         {
             // Arrange
             var webhook = new WebHookModel
@@ -101,11 +105,11 @@ namespace MonobankExporter.UnitTests.Services
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForWebHook(webhook, CancellationToken.None);
+            service.ExportMetricsForWebHook(null, CancellationToken.None);
 
             // Assert
-            _prometheusServiceMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
-            _redisCacheServiceMock.Verify(x => x.GetRecordAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
+            _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
         }
 
         [Fact]
@@ -119,15 +123,16 @@ namespace MonobankExporter.UnitTests.Services
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForWebHook(webhook, CancellationToken.None);
+            service.ExportMetricsForWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _prometheusServiceMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
-            _redisCacheServiceMock.Verify(x => x.GetRecordAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
+            AccountInfoModel result;
+            _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out result), Times.Never);
         }
 
         [Fact]
-        public async Task ExportMetricsForWebHookShouldRetrieveRecordFromCacheAndDontCallExporterServiceIfRecordInCacheNotValid()
+        public void ExportMetricsForWebHookShouldRetrieveRecordFromCacheAndDontCallExporterServiceIfRecordInCacheNotValid()
         {
             // Arrange
             var account = Guid.NewGuid().ToString();
@@ -135,21 +140,23 @@ namespace MonobankExporter.UnitTests.Services
             {
                 Data = new WebHookData { Account = account, StatementItem = new Statement() }
             };
-            _redisCacheServiceMock
-                .Setup(x => x.GetRecordAsync(It.IsAny<string>(), CancellationToken.None))
-                .ReturnsAsync(() => null);
+            AccountInfoModel accountInfo = null;
+
+            _cacheServiceMock
+                .Setup(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<string>(), out accountInfo))
+                .Returns(false);
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForWebHook(webhook, CancellationToken.None);
+            service.ExportMetricsForWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _prometheusServiceMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
-            _redisCacheServiceMock.Verify(x => x.GetRecordAsync(account, It.IsAny<CancellationToken>()), Times.Once);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
+            _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
         }
 
         [Fact]
-        public async Task ExportMetricsForWebHookShouldCallExportService()
+        public void ExportMetricsForWebHookShouldCallExportService()
         {
             // Arrange
             var expectedBalance = 12345678.00;
@@ -162,22 +169,23 @@ namespace MonobankExporter.UnitTests.Services
                     StatementItem = new Statement { Balance = 1234567800 }
                 }
             };
-            _redisCacheServiceMock
-                .Setup(x => x.GetRecordAsync(webhook.Data.Account, CancellationToken.None))
-                .ReturnsAsync(JsonConvert.SerializeObject(accountInfo));
+
+            _cacheServiceMock
+                .Setup(x => x.TryGetValue(CacheType.AccountInfo, webhook.Data.Account, out accountInfo))
+                .Returns(true);
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForWebHook(webhook, CancellationToken.None);
+            service.ExportMetricsForWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _prometheusServiceMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), expectedBalance));
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), expectedBalance));
         }
 
         private MonobankService GetService(MonobankExporterOptions options = null)
         {
             options ??= new MonobankExporterOptions();
-            return new MonobankService(options, _prometheusServiceMock.Object, _redisCacheServiceMock.Object);
+            return new MonobankService(options, _metricsExporterMock.Object, _cacheServiceMock.Object, _loggerMock.Object);
         }
     }
 }
