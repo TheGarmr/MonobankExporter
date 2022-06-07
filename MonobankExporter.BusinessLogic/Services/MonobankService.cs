@@ -15,7 +15,6 @@ namespace MonobankExporter.BusinessLogic.Services
     public class MonobankService : IMonobankService
     {
         private readonly IMonoClient _client;
-        private readonly MonobankExporterOptions _options;
         private readonly ILookupsMemoryCache _cacheService;
         private readonly IMetricsExporterService _metricsExporter;
         private readonly ILogger<MonobankService> _logger;
@@ -28,7 +27,6 @@ namespace MonobankExporter.BusinessLogic.Services
             ILogger<MonobankService> logger)
         {
             _client = monoClient;
-            _options = options;
             _metricsExporter = metricsExporterService;
             _cacheService = cacheService;
             _logger = logger;
@@ -38,9 +36,15 @@ namespace MonobankExporter.BusinessLogic.Services
             };
         }
 
-        public async Task ExportUsersMetricsAsync(bool storeToCache, CancellationToken stoppingToken)
+        public async Task ExportUsersMetricsAsync(bool storeToCache, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
         {
-            foreach (var clientInfo in _options.Clients)
+            if (clients == null || !clients.Any())
+            {
+                _logger.LogWarning("List of clients is empty. Metrics could not be exported.");
+                return;
+            }
+
+            foreach (var clientInfo in clients)
             {
                 await ExportMetricsForUser(storeToCache, clientInfo, stoppingToken);
             }

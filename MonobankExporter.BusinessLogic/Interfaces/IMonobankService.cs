@@ -8,7 +8,7 @@ namespace MonobankExporter.BusinessLogic.Interfaces
 {
     public interface IMonobankService
     {
-        Task ExportUsersMetricsAsync(bool storeToCache, CancellationToken stoppingToken);
+        Task ExportUsersMetricsAsync(bool storeToCache, List<ClientInfoOptions> clients, CancellationToken stoppingToken);
         Task SetupWebHookForUsersAsync(string webHookUrl, List<ClientInfoOptions> clients, CancellationToken stoppingToken);
         bool WebHookUrlIsValid(string webHookUrl);
         Task ExportCurrenciesMetricsAsync(CancellationToken stoppingToken);
