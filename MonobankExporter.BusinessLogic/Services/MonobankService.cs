@@ -113,6 +113,7 @@ namespace MonobankExporter.BusinessLogic.Services
                 if (!_cacheService.TryGetValue(CacheType.AccountInfo, webhook.Data.Account, out AccountInfoModel accountInfo))
                 {
                     _logger.LogWarning($"The cache doesn't contain a record with account info. Metrics won't be exposed. Card: {webhook.Data.Account}...");
+                    return;
                 }
 
                 _metricsExporter.ObserveAccount(accountInfo, webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit);

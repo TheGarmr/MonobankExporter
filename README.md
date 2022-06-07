@@ -99,3 +99,4 @@ basic-auth:
            Added upgrading of musl at the image to avoid all vulnerabilities.<br/>
            Added some labels to the Dockerfile.<br/>
   * v1.5 - Removed Redis dependency with IMemoryCache. Small refactoring of library for monobank client
+  * v1.5.1 - Hotfix of webhook publishing
