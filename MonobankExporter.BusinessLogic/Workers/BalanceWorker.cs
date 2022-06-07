@@ -34,7 +34,7 @@ namespace MonobankExporter.BusinessLogic.Workers
                     try
                     {
                         stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportUsersMetrics(webHookWasSet, stoppingToken);
+                        await _monobankService.ExportUsersMetricsAsync(webHookWasSet, stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {
@@ -56,7 +56,7 @@ namespace MonobankExporter.BusinessLogic.Workers
             if (webhookWillBeUsed)
             {
                 _logger.LogInformation("Webhook url is valid. Trying to setup it.");
-                await _monobankService.SetupWebHookForUsers(_options.WebhookUrl, _options.Clients, cancellationToken);
+                await _monobankService.SetupWebHookForUsersAsync(_options.WebhookUrl, _options.Clients, cancellationToken);
             }
 
             return webhookWillBeUsed;

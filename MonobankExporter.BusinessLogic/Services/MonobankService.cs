@@ -38,7 +38,7 @@ namespace MonobankExporter.BusinessLogic.Services
             };
         }
 
-        public async Task ExportUsersMetrics(bool storeToCache, CancellationToken stoppingToken)
+        public async Task ExportUsersMetricsAsync(bool storeToCache, CancellationToken stoppingToken)
         {
             foreach (var clientInfo in _options.Clients)
             {
@@ -46,7 +46,7 @@ namespace MonobankExporter.BusinessLogic.Services
             }
         }
 
-        public async Task SetupWebHookForUsers(string webHookUrl, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
+        public async Task SetupWebHookForUsersAsync(string webHookUrl, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
         {
             if (clients == null || !clients.Any())
             {
@@ -68,7 +68,7 @@ namespace MonobankExporter.BusinessLogic.Services
             }
         }
 
-        public async Task ExportCurrenciesMetrics(CancellationToken stoppingToken)
+        public async Task ExportCurrenciesMetricsAsync(CancellationToken stoppingToken)
         {
             try
             {
