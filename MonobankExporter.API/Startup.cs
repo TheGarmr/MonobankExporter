@@ -21,7 +21,7 @@ namespace MonobankExporter.API
             logger.Information($"running monobank-exporter. version {GetType().Assembly.GetName().Version}");
             services.AddControllers();
             services.AddRedisCache(Configuration);
-            services.AddPrometheusExporter();
+            services.AddMetricsExporters();
             services.AddMonobankExporterOptions(Configuration);
             services.AddMonobankService();
             services.AddBackgroundWorkers();

@@ -37,9 +37,9 @@ namespace MonobankExporter.API.Extensions
             return services;
         }
 
-        internal static IServiceCollection AddPrometheusExporter(this IServiceCollection services)
+        internal static IServiceCollection AddMetricsExporters(this IServiceCollection services)
         {
-            services.AddSingleton<IPrometheusExporterService, PrometheusExporterService>();
+            services.AddSingleton<IMetricsExporterService, PrometheusExporterService>();
             return services;
         }
 

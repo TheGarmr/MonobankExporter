@@ -16,17 +16,17 @@ namespace MonobankExporter.BusinessLogic.Services
         private readonly MonoClient _client;
         private readonly MonobankExporterOptions _options;
         private readonly IRedisCacheService _redisCacheService;
-        private readonly IExporterService _prometheusExporter;
+        private readonly IMetricsExporterService _metricsExporter;
         private readonly ILogger<MonobankService> _logger;
 
         public MonobankService(MonobankExporterOptions options,
-            IExporterService prometheusExporter,
+            IMetricsExporterService metricsExporterService,
             IRedisCacheService redisCacheService,
             ILogger<MonobankService> logger)
         {
             _client = new MonoClient();
             _options = options;
-            _prometheusExporter = prometheusExporter;
+            _metricsExporter = metricsExporterService;
             _redisCacheService = redisCacheService;
             _logger = logger;
         }
@@ -69,15 +69,15 @@ namespace MonobankExporter.BusinessLogic.Services
                 {
                     if (currency.RateBuy > 0)
                     {
-                        _prometheusExporter.ObserveCurrency(currency.CurrencyNameA, currency.CurrencyNameB, CurrencyObserveType.Buy, currency.RateBuy);
+                        _metricsExporter.ObserveCurrency(currency.CurrencyNameA, currency.CurrencyNameB, CurrencyObserveType.Buy, currency.RateBuy);
                     }
                     if (currency.RateSell > 0)
                     {
-                        _prometheusExporter.ObserveCurrency(currency.CurrencyNameA, currency.CurrencyNameB, CurrencyObserveType.Sell, currency.RateSell);
+                        _metricsExporter.ObserveCurrency(currency.CurrencyNameA, currency.CurrencyNameB, CurrencyObserveType.Sell, currency.RateSell);
                     }
                     if (currency.RateCross > 0)
                     {
-                        _prometheusExporter.ObserveCurrency(currency.CurrencyNameA, currency.CurrencyNameB, CurrencyObserveType.Cross, currency.RateCross);
+                        _metricsExporter.ObserveCurrency(currency.CurrencyNameA, currency.CurrencyNameB, CurrencyObserveType.Cross, currency.RateCross);
                     }
                 }
                 _logger.LogInformation("Observed currencies metrics...");
@@ -108,7 +108,7 @@ namespace MonobankExporter.BusinessLogic.Services
                     return;
                 }
 
-                _prometheusExporter.ObserveAccount(accountInfo, webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit);
+                _metricsExporter.ObserveAccount(accountInfo, webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit);
                 _logger.LogInformation($"Observed metrics by webhook for {accountInfo.HolderName}...");
             }
             catch
@@ -144,7 +144,7 @@ namespace MonobankExporter.BusinessLogic.Services
                         CreditLimit = account.CreditLimitAsMoney
                     };
                     var cacheRecord = JsonConvert.SerializeObject(accountInfo);
-                    _prometheusExporter.ObserveAccount(accountInfo, account.BalanceWithoutCreditLimit);
+                    _metricsExporter.ObserveAccount(accountInfo, account.BalanceWithoutCreditLimit);
 
                     if (webHookWillBeUsed)
                     {
