@@ -126,9 +126,8 @@ namespace MonobankExporter.BusinessLogic.Services
                     _logger.LogError($"Could not expose metrics for client: {clientInfo?.Name}. Token is empty.");
                     return;
                 }
-
-                var client = new MonoClient(clientInfo.Token);
-                var userInfo = await client.Client.GetClientInfoAsync(stoppingToken);
+                
+                var userInfo = await _client.Client.GetClientInfoAsync(clientInfo.Token, stoppingToken);
                 if (!string.IsNullOrWhiteSpace(clientInfo.Name))
                 {
                     _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");

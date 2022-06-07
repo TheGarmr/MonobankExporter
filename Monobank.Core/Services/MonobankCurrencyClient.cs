@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Monobank.Core.Services
 {
-    public class CurrencyService
+    public class MonobankCurrencyClient
     {
         private const string CurrencyEndpoint = "bank/currency";
         private readonly HttpClient _httpClient;
 
-        public CurrencyService(HttpClient client)
+        public MonobankCurrencyClient(HttpClient client)
         {
             _httpClient = client;
         }
