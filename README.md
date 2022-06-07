@@ -90,11 +90,12 @@ basic-auth:
   password: "admin"
 ```
 # What's new
-  * 1.1 - Added ability to set up basic auth for the `metrics` endpoint.
-  * 1.2 - Added Serilog as a logger and cleaned up a lot of useless commands.
-  * 1.3 - Changed timezone to Europe/Kiev at the alpine image. Changed logs file naming.
-  * 1.4 - Fix wrong behavior for webhooks setting and redundant logs.<br/>
-          Switched from root user to non-root at the Dockerfile.<br/>
-          Added GET endpoint for the webhook controller to avoid any possible problems with webhooks setting. According to the documentation, the provided URL should respond with 200 status.<br/>
-          Added upgrading of musl at the image to avoid all vulnerabilities.<br/>
-          Added some labels to the Dockerfile.<br/>
+  * v1.1 - Added ability to set up basic auth for the `metrics` endpoint.
+  * v1.2 - Added Serilog as a logger and cleaned up a lot of useless commands.
+  * v1.3 - Changed timezone to Europe/Kiev at the alpine image. Changed logs file naming.
+  * v1.4 - Fix wrong behavior for webhooks setting and redundant logs.<br/>
+           Switched from root user to non-root at the Dockerfile.<br/>
+           Added GET endpoint for the webhook controller to avoid any possible problems with webhooks setting. According to the documentation, the provided URL should respond with 200 status.<br/>
+           Added upgrading of musl at the image to avoid all vulnerabilities.<br/>
+           Added some labels to the Dockerfile.<br/>
+  * v1.5 - Removed Redis dependency with IMemoryCache. Small refactoring of library for monobank client
