@@ -28,6 +28,8 @@ namespace MonobankExporter.UnitTests.Services
             _loggerMock = new Mock<ILogger<MonobankService>>();
         }
 
+        #region WebHookUrlIsValid
+
         [Theory]
         [InlineData(null)]
         [InlineData("")]
@@ -65,6 +67,10 @@ namespace MonobankExporter.UnitTests.Services
             // Assert
             Assert.True(result);
         }
+
+        #endregion
+
+        #region MyRegion
 
         [Fact]
         public void ExportMetricsForWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfModelIsNull()
@@ -185,6 +191,8 @@ namespace MonobankExporter.UnitTests.Services
             // Assert
             _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), expectedBalance), Times.Once);
         }
+
+        #endregion
 
         private MonobankService GetService(MonobankExporterOptions options = null)
         {
