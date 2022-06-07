@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Monobank.Core;
 using Monobank.Core.Models;
@@ -190,6 +192,66 @@ namespace MonobankExporter.UnitTests.Services
 
             // Assert
             _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), expectedBalance), Times.Once);
+        }
+
+        #endregion
+
+        #region SetupWebHookForUsersAsync
+
+        [Fact]
+        public async Task SetupWebHookForUsersAsyncShouldNotCallClientIfListOfAccountsIsNull()
+        {
+            // Arrange
+            var service = GetService();
+
+            // Act
+            await service.SetupWebHookForUsersAsync("https://example.com", null, CancellationToken.None);
+
+            // Assert
+            _monoClientMock.VerifyGet(x => x.Client, Times.Never);
+        }
+
+        [Fact]
+        public async Task SetupWebHookForUsersAsyncShouldNotCallClientIfListOfAccountsIsEmpty()
+        {
+            // Arrange
+            var service = GetService();
+
+            // Act
+            await service.SetupWebHookForUsersAsync("https://example.com", new List<ClientInfoOptions>(), CancellationToken.None);
+
+            // Assert
+            _monoClientMock.VerifyGet(x => x.Client, Times.Never);
+        }
+
+        #endregion
+
+        #region ExportUsersMetricsAsync
+
+        [Fact]
+        public async Task ExportUsersMetricsAsyncShouldNotCallClientIfListOfAccountsIsNull()
+        {
+            // Arrange
+            var service = GetService();
+
+            // Act
+            await service.ExportUsersMetricsAsync(true, null, CancellationToken.None);
+
+            // Assert
+            _monoClientMock.VerifyGet(x => x.Client, Times.Never);
+        }
+
+        [Fact]
+        public async Task ExportUsersMetricsAsyncShouldNotCallClientIfListOfAccountsIsEmpty()
+        {
+            // Arrange
+            var service = GetService();
+
+            // Act
+            await service.ExportUsersMetricsAsync(true, new List<ClientInfoOptions>(), CancellationToken.None);
+
+            // Assert
+            _monoClientMock.VerifyGet(x => x.Client, Times.Never);
         }
 
         #endregion
