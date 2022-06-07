@@ -77,7 +77,7 @@ namespace MonobankExporter.BusinessLogic.Services
         {
             try
             {
-                var currencies = await _client.Currency.GetCurrencies(stoppingToken);
+                var currencies = await _client.Currency.GetCurrenciesAsync(stoppingToken);
 
                 var currenciesToObserve = currencies.Where(x =>
                     !string.IsNullOrWhiteSpace(x.CurrencyNameA) && !string.IsNullOrWhiteSpace(x.CurrencyNameB));

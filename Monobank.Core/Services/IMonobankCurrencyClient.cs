@@ -7,6 +7,6 @@ namespace MonobankExporter.Client.Services
 {
     public interface IMonobankCurrencyClient
     {
-        Task<ICollection<CurrencyInfo>> GetCurrencies(CancellationToken stoppingToken);
+        Task<ICollection<CurrencyInfo>> GetCurrenciesAsync(CancellationToken stoppingToken);
     }
 }

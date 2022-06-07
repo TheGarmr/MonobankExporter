@@ -18,7 +18,7 @@ namespace MonobankExporter.Client.Services
             _httpClient = client;
         }
 
-        public async Task<ICollection<CurrencyInfo>> GetCurrencies(CancellationToken stoppingToken)
+        public async Task<ICollection<CurrencyInfo>> GetCurrenciesAsync(CancellationToken stoppingToken)
         {
             var uri = new Uri($"{CurrencyEndpoint}", UriKind.Relative);
             var response = await _httpClient.GetAsync(uri, stoppingToken);
