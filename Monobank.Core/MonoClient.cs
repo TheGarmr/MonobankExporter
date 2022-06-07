@@ -1,9 +1,9 @@
-﻿using Monobank.Core.Services;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using MonobankExporter.Client.Services;
 
-namespace Monobank.Core
+namespace MonobankExporter.Client
 {
     public class MonoClient : IMonoClient
     {

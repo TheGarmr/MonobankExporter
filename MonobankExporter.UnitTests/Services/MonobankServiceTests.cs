@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Monobank.Core;
-using Monobank.Core.Models;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Models;
 using MonobankExporter.BusinessLogic.Services;
+using MonobankExporter.Client;
+using MonobankExporter.Client.Models;
 using Moq;
 using Xunit;
 

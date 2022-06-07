@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Monobank.Core.Models;
 using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.Client.Models;
 
 namespace MonobankExporter.API.Controllers
 {

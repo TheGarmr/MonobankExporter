@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace Monobank.Core.Models.Consts
+namespace MonobankExporter.Client.Models.Consts
 {
     [JsonConverter(typeof(JsonStringEnumMemberConverter))]
     public enum AccountTypes

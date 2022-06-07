@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Monobank.Core.Models
+namespace MonobankExporter.Client.Models
 {
     public class Error
     {

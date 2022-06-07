@@ -1,6 +1,6 @@
-﻿using Monobank.Core.Services;
+﻿using MonobankExporter.Client.Services;
 
-namespace Monobank.Core
+namespace MonobankExporter.Client
 {
     public interface IMonoClient
     {

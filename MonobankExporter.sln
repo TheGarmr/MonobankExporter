@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonobankExporter.API", "MonobankExporter.API\MonobankExporter.API.csproj", "{B8A56C39-3166-4590-9AB8-2763189F4BE7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monobank.Core", "Monobank.Core\Monobank.Core.csproj", "{4536ECA0-60C8-47BC-B302-67161A2FDA5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonobankExporter.Client", "Monobank.Core\MonobankExporter.Client.csproj", "{4536ECA0-60C8-47BC-B302-67161A2FDA5F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonobankExporter.BusinessLogic", "MonobankExporter.BusinessLogic\MonobankExporter.BusinessLogic.csproj", "{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}"
 EndProject

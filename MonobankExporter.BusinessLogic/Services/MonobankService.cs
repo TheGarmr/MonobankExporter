@@ -5,10 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Monobank.Core;
-using Monobank.Core.Models;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Models;
+using MonobankExporter.Client;
+using MonobankExporter.Client.Models;
 
 namespace MonobankExporter.BusinessLogic.Services
 {
