@@ -115,7 +115,7 @@ namespace MonobankExporter.UnitTests.Services
         }
 
         [Fact]
-        public async Task ExportMetricsForWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfStatementItemIsNull()
+        public void ExportMetricsForWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfStatementItemIsNull()
         {
             // Arrange
             var webhook = new WebHookModel
