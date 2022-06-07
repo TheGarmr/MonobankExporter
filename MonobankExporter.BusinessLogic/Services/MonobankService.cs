@@ -16,11 +16,11 @@ namespace MonobankExporter.BusinessLogic.Services
         private readonly MonoClient _client;
         private readonly MonobankExporterOptions _options;
         private readonly IRedisCacheService _redisCacheService;
-        private readonly IPrometheusExporterService _prometheusExporter;
+        private readonly IExporterService _prometheusExporter;
         private readonly ILogger<MonobankService> _logger;
 
         public MonobankService(MonobankExporterOptions options,
-            IPrometheusExporterService prometheusExporter,
+            IExporterService prometheusExporter,
             IRedisCacheService redisCacheService,
             ILogger<MonobankService> logger)
         {
@@ -123,7 +123,7 @@ namespace MonobankExporter.BusinessLogic.Services
             {
                 if (string.IsNullOrWhiteSpace(clientInfo?.Token))
                 {
-                    _logger.LogError($"Could not expose metrics for client: {clientInfo?.Name}. Token is not empty.");
+                    _logger.LogError($"Could not expose metrics for client: {clientInfo?.Name}. Token is empty.");
                     return;
                 }
 
@@ -131,7 +131,7 @@ namespace MonobankExporter.BusinessLogic.Services
                 var userInfo = await client.Client.GetClientInfoAsync(stoppingToken);
                 if (!string.IsNullOrWhiteSpace(clientInfo.Name))
                 {
-                    _logger.LogInformation($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
+                    _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
                     userInfo.Name = clientInfo.Name;
                 }
 
@@ -188,7 +188,7 @@ namespace MonobankExporter.BusinessLogic.Services
 
             if (!uriResult.AbsoluteUri.EndsWith("/webhook"))
             {
-                _logger.LogWarning("The webhook url does not contain the '/webhook' path.");
+                _logger.LogWarning("The webhook url does not ends with the '/webhook' path.");
 
                 return false;
             }
