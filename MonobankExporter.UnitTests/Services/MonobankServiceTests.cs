@@ -152,7 +152,7 @@ namespace MonobankExporter.UnitTests.Services
 
             // Assert
             _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
-            _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
+            _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, account, out _tryGetResult), Times.Once);
         }
 
         [Fact]
@@ -179,7 +179,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsForWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), expectedBalance));
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), expectedBalance), Times.Once);
         }
 
         private MonobankService GetService(MonobankExporterOptions options = null)
