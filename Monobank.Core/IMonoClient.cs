@@ -4,7 +4,7 @@ namespace MonobankExporter.Client
 {
     public interface IMonoClient
     {
-        MonobankCurrencyClient Currency { get; }
-        MonobankServiceClient Client { get; }
+        IMonobankCurrencyClient Currency { get; }
+        IMonobankServiceClient Client { get; }
     }
 }

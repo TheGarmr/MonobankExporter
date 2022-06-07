@@ -9,7 +9,7 @@ using MonobankExporter.Client.Models;
 
 namespace MonobankExporter.Client.Services
 {
-    public class MonobankServiceClient
+    public class MonobankServiceClient : IMonobankServiceClient
     {
         private const string ClientInfoEndpoint = "personal/client-info";
         private const string StatementEndpoint = "personal/statement";

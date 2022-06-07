@@ -8,7 +8,7 @@ using MonobankExporter.Client.Models;
 
 namespace MonobankExporter.Client.Services
 {
-    public class MonobankCurrencyClient
+    public class MonobankCurrencyClient : IMonobankCurrencyClient
     {
         private const string CurrencyEndpoint = "bank/currency";
         private readonly HttpClient _httpClient;

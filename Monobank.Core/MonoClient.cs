@@ -10,8 +10,8 @@ namespace MonobankExporter.Client
         private const string BaseApiUrl = "https://api.monobank.ua/";
         private const string ResponseMediaType = "application/json";
 
-        public MonobankCurrencyClient Currency { get; }
-        public MonobankServiceClient Client { get; }
+        public IMonobankCurrencyClient Currency { get; }
+        public IMonobankServiceClient Client { get; }
 
         public MonoClient()
         {
