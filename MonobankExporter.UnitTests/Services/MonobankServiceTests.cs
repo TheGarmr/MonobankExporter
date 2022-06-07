@@ -50,6 +50,8 @@ namespace MonobankExporter.UnitTests.Services
         [Theory]
         [InlineData("http://example.com/webhook")]
         [InlineData("https://example.com/webhook")]
+        [InlineData("https://subdomain.example.com/webhook")]
+        [InlineData("https://subdomain.subdomain.example.com/webhook")]
         public void WebHookUrlIsValidShouldReturnTrueIfUrlIsValid(string webHookUrl)
         {
             // Arrange
