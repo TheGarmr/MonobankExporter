@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Monobank.Core;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Models;
 using MonobankExporter.BusinessLogic.Services;
@@ -33,6 +34,7 @@ namespace MonobankExporter.API.Extensions
         internal static IServiceCollection AddMonobankService(this IServiceCollection services)
         {
             services.AddScoped<IMonobankService, MonobankService>();
+            services.AddScoped<IMonoClient, MonoClient>();
             return services;
         }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Monobank.Core;
 using Monobank.Core.Models;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Models;
@@ -13,6 +13,7 @@ namespace MonobankExporter.UnitTests.Services
 {
     public class MonobankServiceTests
     {
+        private readonly Mock<IMonoClient> _monoClientMock;
         private readonly Mock<IMetricsExporterService> _metricsExporterMock;
         private readonly Mock<ILookupsMemoryCache> _cacheServiceMock;
         private readonly Mock<ILogger<MonobankService>> _loggerMock;
@@ -21,6 +22,7 @@ namespace MonobankExporter.UnitTests.Services
 
         public MonobankServiceTests()
         {
+            _monoClientMock = new Mock<IMonoClient>();
             _metricsExporterMock = new Mock<IMetricsExporterService>();
             _cacheServiceMock = new Mock<ILookupsMemoryCache>();
             _loggerMock = new Mock<ILogger<MonobankService>>();
@@ -107,7 +109,7 @@ namespace MonobankExporter.UnitTests.Services
             var service = GetService();
 
             // Act
-            service.ExportMetricsForWebHook(null, CancellationToken.None);
+            service.ExportMetricsForWebHook(webhook, CancellationToken.None);
 
             // Assert
             _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
@@ -187,7 +189,7 @@ namespace MonobankExporter.UnitTests.Services
         private MonobankService GetService(MonobankExporterOptions options = null)
         {
             options ??= new MonobankExporterOptions();
-            return new MonobankService(options, _metricsExporterMock.Object, _cacheServiceMock.Object, _loggerMock.Object);
+            return new MonobankService(options, _monoClientMock.Object, _metricsExporterMock.Object, _cacheServiceMock.Object, _loggerMock.Object);
         }
     }
 }

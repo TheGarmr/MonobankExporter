@@ -14,7 +14,7 @@ namespace MonobankExporter.BusinessLogic.Services
 {
     public class MonobankService : IMonobankService
     {
-        private readonly MonoClient _client;
+        private readonly IMonoClient _client;
         private readonly MonobankExporterOptions _options;
         private readonly ILookupsMemoryCache _cacheService;
         private readonly IMetricsExporterService _metricsExporter;
@@ -22,11 +22,12 @@ namespace MonobankExporter.BusinessLogic.Services
         private readonly MemoryCacheEntryOptions _cacheOptions;
 
         public MonobankService(MonobankExporterOptions options,
+            IMonoClient monoClient,
             IMetricsExporterService metricsExporterService,
             ILookupsMemoryCache cacheService,
             ILogger<MonobankService> logger)
         {
-            _client = new MonoClient();
+            _client = monoClient;
             _options = options;
             _metricsExporter = metricsExporterService;
             _cacheService = cacheService;

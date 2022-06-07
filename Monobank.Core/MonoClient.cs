@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 
 namespace Monobank.Core
 {
-    public class MonoClient
+    public class MonoClient : IMonoClient
     {
         private const string BaseApiUrl = "https://api.monobank.ua/";
         private const string ResponseMediaType = "application/json";
