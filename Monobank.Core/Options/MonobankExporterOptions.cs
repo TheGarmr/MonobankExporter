@@ -8,7 +8,7 @@ namespace MonobankExporter.Domain.Options
         private int _clientsRefreshTimeInMinutes = 60;
         private int _currenciesRefreshTimeInMinutes = 10;
 
-        public List<ClientInfoOptions> Clients { get; set; } = new();
+        public List<ClientInfoOptions> Clients { get; set; } = new List<ClientInfoOptions>();
         public string WebhookUrl { get; set; }
         public string ApiBaseUrl { get; set; } = "https://api.monobank.ua/";
 
