@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.Domain.Enums;
-using MonobankExporter.Domain.Models;
 
 namespace MonobankExporter.BusinessLogic.Services
 {

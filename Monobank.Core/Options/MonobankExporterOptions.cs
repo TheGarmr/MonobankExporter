@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using MonobankExporter.Domain.Models;
 
 namespace MonobankExporter.Domain.Options
 {
