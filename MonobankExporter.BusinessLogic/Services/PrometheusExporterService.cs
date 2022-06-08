@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using MonobankExporter.BusinessLogic.Interfaces;
+﻿using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.Domain.Enums;
 using MonobankExporter.Domain.Models;
 using Prometheus;
