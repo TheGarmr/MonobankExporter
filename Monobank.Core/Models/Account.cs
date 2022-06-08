@@ -1,8 +1,8 @@
-﻿using ISO._4217;
-using System.Text.Json.Serialization;
-using Monobank.Core.Models.Consts;
+﻿using System.Text.Json.Serialization;
+using ISO._4217;
+using MonobankExporter.Client.Models.Consts;
 
-namespace Monobank.Core.Models
+namespace MonobankExporter.Client.Models
 {
     public class Account
     {

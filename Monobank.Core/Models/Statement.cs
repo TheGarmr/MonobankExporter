@@ -1,9 +1,9 @@
-﻿using ISO._4217;
-using Monobank.Core.Extensions;
-using System;
+﻿using System;
 using System.Text.Json.Serialization;
+using ISO._4217;
+using MonobankExporter.Client.Extensions;
 
-namespace Monobank.Core.Models
+namespace MonobankExporter.Client.Models
 {
     public class Statement
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Monobank.Core.Extensions
+namespace MonobankExporter.Client.Extensions
 {
     public static class DateTimeExtensions
     {

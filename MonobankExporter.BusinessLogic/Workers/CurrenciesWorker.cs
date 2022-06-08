@@ -33,7 +33,7 @@ namespace MonobankExporter.BusinessLogic.Workers
                     try
                     {
                         stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportCurrenciesMetrics(stoppingToken);
+                        await _monobankService.ExportMetricsForCurrenciesAsync(stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {

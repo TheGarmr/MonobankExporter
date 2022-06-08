@@ -1,15 +1,15 @@
-﻿using Monobank.Core.Extensions;
-using Monobank.Core.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using MonobankExporter.Client.Extensions;
+using MonobankExporter.Client.Models;
 
-namespace Monobank.Core.Services
+namespace MonobankExporter.Client.Services
 {
-    public class MonobankServiceClient
+    public class MonobankServiceClient : IMonobankServiceClient
     {
         private const string ClientInfoEndpoint = "personal/client-info";
         private const string StatementEndpoint = "personal/statement";

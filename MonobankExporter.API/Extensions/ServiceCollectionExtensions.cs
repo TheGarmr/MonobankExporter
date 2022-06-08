@@ -4,6 +4,7 @@ using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Models;
 using MonobankExporter.BusinessLogic.Services;
 using MonobankExporter.BusinessLogic.Workers;
+using MonobankExporter.Client;
 using Serilog;
 using Serilog.Events;
 
@@ -33,6 +34,7 @@ namespace MonobankExporter.API.Extensions
         internal static IServiceCollection AddMonobankService(this IServiceCollection services)
         {
             services.AddScoped<IMonobankService, MonobankService>();
+            services.AddScoped<IMonoClient, MonoClient>();
             return services;
         }
 

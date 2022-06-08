@@ -5,11 +5,11 @@ VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonobankExporter.API", "MonobankExporter.API\MonobankExporter.API.csproj", "{B8A56C39-3166-4590-9AB8-2763189F4BE7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monobank.Core", "Monobank.Core\Monobank.Core.csproj", "{4536ECA0-60C8-47BC-B302-67161A2FDA5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonobankExporter.Client", "Monobank.Core\MonobankExporter.Client.csproj", "{4536ECA0-60C8-47BC-B302-67161A2FDA5F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monobank.Tests", "Monobank.Tests\Monobank.Tests.csproj", "{AE9296C3-D1D1-4B4D-B56F-5A86CA92360E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonobankExporter.BusinessLogic", "MonobankExporter.BusinessLogic\MonobankExporter.BusinessLogic.csproj", "{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonobankExporter.BusinessLogic", "MonobankExporter.BusinessLogic\MonobankExporter.BusinessLogic.csproj", "{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonobankExporter.UnitTests", "MonobankExporter.UnitTests\MonobankExporter.UnitTests.csproj", "{2B71B77A-BFDE-42EC-A0F8-42538E33F32B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,14 +25,14 @@ Global
 		{4536ECA0-60C8-47BC-B302-67161A2FDA5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4536ECA0-60C8-47BC-B302-67161A2FDA5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4536ECA0-60C8-47BC-B302-67161A2FDA5F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AE9296C3-D1D1-4B4D-B56F-5A86CA92360E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE9296C3-D1D1-4B4D-B56F-5A86CA92360E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AE9296C3-D1D1-4B4D-B56F-5A86CA92360E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AE9296C3-D1D1-4B4D-B56F-5A86CA92360E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C37755E-9B9A-4F91-A483-3DBC3E0E6CC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B71B77A-BFDE-42EC-A0F8-42538E33F32B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B71B77A-BFDE-42EC-A0F8-42538E33F32B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B71B77A-BFDE-42EC-A0F8-42538E33F32B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B71B77A-BFDE-42EC-A0F8-42538E33F32B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

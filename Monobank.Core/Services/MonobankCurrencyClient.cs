@@ -1,14 +1,14 @@
-﻿using Monobank.Core.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using MonobankExporter.Client.Models;
 
-namespace Monobank.Core.Services
+namespace MonobankExporter.Client.Services
 {
-    public class MonobankCurrencyClient
+    public class MonobankCurrencyClient : IMonobankCurrencyClient
     {
         private const string CurrencyEndpoint = "bank/currency";
         private readonly HttpClient _httpClient;
@@ -18,7 +18,7 @@ namespace Monobank.Core.Services
             _httpClient = client;
         }
 
-        public async Task<ICollection<CurrencyInfo>> GetCurrencies(CancellationToken stoppingToken)
+        public async Task<ICollection<CurrencyInfo>> GetCurrenciesAsync(CancellationToken stoppingToken)
         {
             var uri = new Uri($"{CurrencyEndpoint}", UriKind.Relative);
             var response = await _httpClient.GetAsync(uri, stoppingToken);
