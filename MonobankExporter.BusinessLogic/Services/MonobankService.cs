@@ -36,7 +36,7 @@ namespace MonobankExporter.BusinessLogic.Services
             };
         }
 
-        public async Task ExportUsersMetricsAsync(bool storeToCache, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
+        public async Task ExportMetricsForUsersAsync(bool storeToCache, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
         {
             if (clients == null || !clients.Any())
             {
@@ -73,7 +73,7 @@ namespace MonobankExporter.BusinessLogic.Services
             }
         }
 
-        public async Task ExportCurrenciesMetricsAsync(CancellationToken stoppingToken)
+        public async Task ExportMetricsForCurrenciesAsync(CancellationToken stoppingToken)
         {
             try
             {
@@ -105,7 +105,7 @@ namespace MonobankExporter.BusinessLogic.Services
             }
         }
 
-        public void ExportMetricsForWebHook(WebHookModel webhook, CancellationToken stoppingToken)
+        public void ExportMetricsOnWebHook(WebHookModel webhook, CancellationToken stoppingToken)
         {
             _logger.LogInformation($"A webHook received. Card: {webhook?.Data?.Account}...");
             try
@@ -177,39 +177,33 @@ namespace MonobankExporter.BusinessLogic.Services
             if (string.IsNullOrWhiteSpace(webHookUrl))
             {
                 _logger.LogWarning("The webhook url is empty.");
-
                 return false;
             }
 
             _logger.LogInformation($"Validating webhook url from configs: {webHookUrl}.");
 
             var isUrl = Uri.TryCreate(webHookUrl, UriKind.Absolute, out var uriResult);
-            // ToDo: add validation that domain works correctly
             if (!isUrl)
             {
                 _logger.LogWarning("The webhook url has bad format.");
-
                 return false;
             }
 
             if (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps)
             {
                 _logger.LogWarning("The webhook url does not contain HTTP or HTTPS.");
-
                 return false;
             }
 
             if (!uriResult.AbsoluteUri.Contains("."))
             {
                 _logger.LogWarning("The webhook url does not dot in the address. It seems like it's not a domain.");
-
                 return false;
             }
 
             if (!uriResult.AbsoluteUri.EndsWith("/webhook"))
             {
                 _logger.LogWarning("The webhook url does not ends with the '/webhook' path.");
-
                 return false;
             }
 

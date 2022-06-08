@@ -34,7 +34,7 @@ namespace MonobankExporter.BusinessLogic.Workers
                     try
                     {
                         stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportUsersMetricsAsync(webHookWasSet, _options.Clients, stoppingToken);
+                        await _monobankService.ExportMetricsForUsersAsync(webHookWasSet, _options.Clients, stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {
