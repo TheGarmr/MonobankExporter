@@ -4,10 +4,11 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using MonobankExporter.Client.Extensions;
-using MonobankExporter.Client.Models;
+using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.Domain.Extensions;
+using MonobankExporter.Domain.Models.Client;
 
-namespace MonobankExporter.Client.Services
+namespace MonobankExporter.BusinessLogic.Services
 {
     public class MonobankServiceClient : IMonobankServiceClient
     {
@@ -35,7 +36,7 @@ namespace MonobankExporter.Client.Services
             var responseString = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
-                var error = JsonSerializer.Deserialize<Error>(responseString);
+                var error = JsonSerializer.Deserialize<MonobankApiError>(responseString);
                 throw new Exception(error.Description);
             }
             return JsonSerializer.Deserialize<UserInfo>(responseString);
@@ -58,7 +59,7 @@ namespace MonobankExporter.Client.Services
             var responseString = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
-                var error = JsonSerializer.Deserialize<Error>(responseString);
+                var error = JsonSerializer.Deserialize<MonobankApiError>(responseString);
                 throw new Exception(error.Description);
             }
             _previousRequestTimestamp = DateTime.UtcNow;

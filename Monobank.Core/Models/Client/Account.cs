@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using ISO._4217;
-using MonobankExporter.Client.Models.Consts;
+using MonobankExporter.Domain.Enums;
 
-namespace MonobankExporter.Client.Models
+namespace MonobankExporter.Domain.Models.Client
 {
     public class Account
     {
@@ -19,7 +19,7 @@ namespace MonobankExporter.Client.Models
         public int CurrencyCode { get; set; }
 
         [JsonPropertyName("cashbackType")]
-        public CashbackTypes CashbackType { get; set; }
+        public CashbackType CashbackType { get; set; }
 
         [JsonPropertyName("type")]
         public AccountTypes Type { get; set; }

@@ -1,6 +1,4 @@
-﻿using MonobankExporter.Client.Services;
-
-namespace MonobankExporter.Client
+﻿namespace MonobankExporter.BusinessLogic.Interfaces
 {
     public interface IMonoClient
     {

@@ -1,10 +1,10 @@
 ﻿using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace MonobankExporter.Client.Models.Consts
+namespace MonobankExporter.Domain.Enums
 {
     [JsonConverter(typeof(JsonStringEnumMemberConverter))]
-    public enum CashbackTypes
+    public enum CashbackType
     {
         [EnumMember(Value = "")]
         None = 0,

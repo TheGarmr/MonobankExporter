@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Models;
 using MonobankExporter.BusinessLogic.Services;
 using MonobankExporter.BusinessLogic.Workers;
-using MonobankExporter.Client;
+using MonobankExporter.Domain.Options;
 using Serilog;
 using Serilog.Events;
 

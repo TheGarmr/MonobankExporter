@@ -1,15 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace MonobankExporter.Client.Models
+namespace MonobankExporter.Domain.Models.Client
 {
-    public class WebHookModel
-    {
-        [JsonPropertyName("type")]
-        public string Type { get; set; }
-        [JsonPropertyName("data")]
-        public WebHookData Data { get; set; }
-    }
-
     public class WebHookData
     {
         [JsonPropertyName("account")]

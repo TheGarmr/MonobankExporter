@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using MonobankExporter.Domain.Models;
 
-namespace MonobankExporter.BusinessLogic.Models
+namespace MonobankExporter.Domain.Options
 {
     public class MonobankExporterOptions
     {

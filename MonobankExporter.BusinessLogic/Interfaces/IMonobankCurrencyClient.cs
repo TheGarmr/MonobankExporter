@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using MonobankExporter.Client.Models;
+using MonobankExporter.Domain.Models.Client;
 
-namespace MonobankExporter.Client.Services
+namespace MonobankExporter.BusinessLogic.Interfaces
 {
     public interface IMonobankCurrencyClient
     {

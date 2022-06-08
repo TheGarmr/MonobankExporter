@@ -4,12 +4,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Models;
 using MonobankExporter.BusinessLogic.Services;
-using MonobankExporter.Client;
-using MonobankExporter.Client.Models;
-using MonobankExporter.Client.Models.Consts;
-using MonobankExporter.Client.Services;
+using MonobankExporter.Domain.Enums;
+using MonobankExporter.Domain.Models;
+using MonobankExporter.Domain.Models.Client;
+using MonobankExporter.Domain.Options;
 using Moq;
 using Xunit;
 using MemoryCacheEntryOptions = Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions;
@@ -25,7 +24,7 @@ namespace MonobankExporter.UnitTests.Services
         private readonly Mock<IMonobankCurrencyClient> _currencyClientMock;
         private readonly Mock<IMonobankServiceClient> _monobankServiceClientMock;
 
-        private AccountInfoModel _tryGetResult;
+        private AccountInfo _tryGetResult;
 
         public MonobankServiceTests()
         {
@@ -94,7 +93,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(null, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
         }
 
@@ -102,7 +101,7 @@ namespace MonobankExporter.UnitTests.Services
         public void ExportMetricsOnWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfDataIsNull()
         {
             // Arrange
-            var webhook = new WebHookModel
+            var webhook = new WebHook
             {
                 Data = null
             };
@@ -112,7 +111,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
         }
 
@@ -120,7 +119,7 @@ namespace MonobankExporter.UnitTests.Services
         public void ExportMetricsOnWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfAccountIsNull()
         {
             // Arrange
-            var webhook = new WebHookModel
+            var webhook = new WebHook
             {
                 Data = new WebHookData { Account = null }
             };
@@ -130,7 +129,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
         }
 
@@ -138,7 +137,7 @@ namespace MonobankExporter.UnitTests.Services
         public void ExportMetricsOnWebHookShouldNotRetrieveRecordFromCacheAndCallExportServiceIfStatementItemIsNull()
         {
             // Arrange
-            var webhook = new WebHookModel
+            var webhook = new WebHook
             {
                 Data = new WebHookData { Account = "SomeAccount", StatementItem = null }
             };
@@ -148,8 +147,8 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
-            AccountInfoModel result;
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+            AccountInfo result;
             _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out result), Times.Never);
         }
 
@@ -158,11 +157,11 @@ namespace MonobankExporter.UnitTests.Services
         {
             // Arrange
             var account = Guid.NewGuid().ToString();
-            var webhook = new WebHookModel
+            var webhook = new WebHook
             {
                 Data = new WebHookData { Account = account, StatementItem = new Statement() }
             };
-            AccountInfoModel accountInfo = null;
+            AccountInfo accountInfo = null;
 
             _cacheServiceMock
                 .Setup(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<string>(), out accountInfo))
@@ -173,7 +172,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, account, out _tryGetResult), Times.Once);
         }
 
@@ -182,8 +181,8 @@ namespace MonobankExporter.UnitTests.Services
         {
             // Arrange
             var expectedBalance = 12345678.00;
-            var accountInfo = new AccountInfoModel();
-            var webhook = new WebHookModel
+            var accountInfo = new AccountInfo();
+            var webhook = new WebHook
             {
                 Data = new WebHookData
                 {
@@ -201,7 +200,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), expectedBalance), Times.Once);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), expectedBalance), Times.Once);
         }
 
         #endregion
@@ -307,10 +306,10 @@ namespace MonobankExporter.UnitTests.Services
             // Assert
             _monobankServiceClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(),
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(),
                 It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.Set(It.IsAny<CacheType>(),
-                It.IsAny<string>(), It.IsAny<AccountInfoModel>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Never);
+                It.IsAny<string>(), It.IsAny<AccountInfo>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Never);
         }
 
         [Fact]
@@ -335,7 +334,7 @@ namespace MonobankExporter.UnitTests.Services
                 It.IsAny<CancellationToken>()), Times.Once);
             foreach (var account in client.Accounts)
             {
-                _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(),
+                _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(),
                     account.BalanceWithoutCreditLimit), Times.Once);
             }
         }
@@ -360,7 +359,7 @@ namespace MonobankExporter.UnitTests.Services
             foreach (var account in client.Accounts)
             {
                 _cacheServiceMock.Verify(x => x.Set(CacheType.AccountInfo,
-                    account.Id, It.IsAny<AccountInfoModel>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Once);
+                    account.Id, It.IsAny<AccountInfo>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Once);
             }
         }
 
@@ -382,7 +381,7 @@ namespace MonobankExporter.UnitTests.Services
 
             // Assert
             _cacheServiceMock.Verify(x => x.Set(CacheType.AccountInfo,
-                accountId, It.IsAny<AccountInfoModel>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Never);
+                accountId, It.IsAny<AccountInfo>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Never);
         }
 
         [Fact]
@@ -396,9 +395,9 @@ namespace MonobankExporter.UnitTests.Services
             var clients = new List<ClientInfoOptions> { new () { Token = token, Name = nameFromConfig } };
             _monobankServiceClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(client);
-            AccountInfoModel expectedAccount = null;
-            _metricsExporterMock.Setup(x => x.ObserveAccount(It.IsAny<AccountInfoModel>(), It.IsAny<double>()))
-                .Callback((AccountInfoModel account, double balance) => expectedAccount = account);
+            AccountInfo expectedAccount = null;
+            _metricsExporterMock.Setup(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()))
+                .Callback((AccountInfo account, double balance) => expectedAccount = account);
             var service = GetService();
 
             // Act

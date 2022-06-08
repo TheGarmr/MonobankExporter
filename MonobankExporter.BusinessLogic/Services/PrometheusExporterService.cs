@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Models;
+using MonobankExporter.Domain.Enums;
+using MonobankExporter.Domain.Models;
 using Prometheus;
 
 namespace MonobankExporter.BusinessLogic.Services
@@ -24,7 +25,7 @@ namespace MonobankExporter.BusinessLogic.Services
             LabelNames = new[] { "currency_a", "currency_b" }
         });
 
-        public void ObserveAccount(AccountInfoModel account, double balance)
+        public void ObserveAccount(AccountInfo account, double balance)
         {
             _balanceGauge.Labels(account.HolderName, account.CurrencyType, account.CardType, account.CreditLimit.ToString(CultureInfo.InvariantCulture)).Set(balance);
         }

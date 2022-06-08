@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace MonobankExporter.Client.Models
+namespace MonobankExporter.Domain.Models.Client
 {
-    public class Error
+    public class MonobankApiError
     {
         [JsonPropertyName("errorDescription")]
         public string Description { get; set; }

@@ -2,9 +2,8 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
-using MonobankExporter.BusinessLogic.Models;
-using MonobankExporter.Client;
-using MonobankExporter.Client.Services;
+using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.Domain.Options;
 
 namespace MonobankExporter.BusinessLogic.Services
 {

@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Models;
-using MonobankExporter.Client;
-using MonobankExporter.Client.Models;
+using MonobankExporter.Domain.Enums;
+using MonobankExporter.Domain.Models;
+using MonobankExporter.Domain.Models.Client;
+using MonobankExporter.Domain.Options;
 
 namespace MonobankExporter.BusinessLogic.Services
 {
@@ -105,7 +106,7 @@ namespace MonobankExporter.BusinessLogic.Services
             }
         }
 
-        public void ExportMetricsOnWebHook(WebHookModel webhook, CancellationToken stoppingToken)
+        public void ExportMetricsOnWebHook(WebHook webhook, CancellationToken stoppingToken)
         {
             _logger.LogInformation($"A webHook received. Card: {webhook?.Data?.Account}...");
             try
@@ -116,7 +117,7 @@ namespace MonobankExporter.BusinessLogic.Services
                     return;
                 }
 
-                if (!_cacheService.TryGetValue(CacheType.AccountInfo, webhook.Data.Account, out AccountInfoModel accountInfo))
+                if (!_cacheService.TryGetValue(CacheType.AccountInfo, webhook.Data.Account, out AccountInfo accountInfo))
                 {
                     _logger.LogWarning($"The cache doesn't contain a record with account info. Metrics won't be exposed. Card: {webhook.Data.Account}...");
                     return;
@@ -150,7 +151,7 @@ namespace MonobankExporter.BusinessLogic.Services
 
                 foreach (var account in userInfo.Accounts)
                 {
-                    var accountInfo = new AccountInfoModel
+                    var accountInfo = new AccountInfo
                     {
                         HolderName = userInfo.Name,
                         CurrencyType = account.CurrencyName,

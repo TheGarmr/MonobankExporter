@@ -4,9 +4,10 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using MonobankExporter.Client.Models;
+using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.Domain.Models.Client;
 
-namespace MonobankExporter.Client.Services
+namespace MonobankExporter.BusinessLogic.Services
 {
     public class MonobankCurrencyClient : IMonobankCurrencyClient
     {
@@ -25,7 +26,7 @@ namespace MonobankExporter.Client.Services
             var responseString = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
-                var error = JsonSerializer.Deserialize<Error>(responseString);
+                var error = JsonSerializer.Deserialize<MonobankApiError>(responseString);
                 throw new Exception(error.Description);
             }
 
