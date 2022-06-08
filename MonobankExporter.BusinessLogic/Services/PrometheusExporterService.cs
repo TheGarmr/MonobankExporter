@@ -10,7 +10,11 @@ namespace MonobankExporter.BusinessLogic.Services
     {
         private readonly Gauge _balanceGauge = Metrics.CreateGauge("monobank_balance", "shows current balance", new GaugeConfiguration
         {
-            LabelNames = new[] { "name", "currency_type", "card_type", "credit_limit" }
+            LabelNames = new[] { "name", "currency_type", "card_type" }
+        });
+        private readonly Gauge _creditLimitGauge = Metrics.CreateGauge("monobank_credit_limit", "shows current credit limit", new GaugeConfiguration
+        {
+            LabelNames = new[] { "name", "currency_type", "card_type" }
         });
         private readonly Gauge _currenciesBuyGauge = Metrics.CreateGauge("monobank_currencies_buy", "shows current rate for buy", new GaugeConfiguration
         {
@@ -27,7 +31,8 @@ namespace MonobankExporter.BusinessLogic.Services
 
         public void ObserveAccount(AccountInfo account, double balance)
         {
-            _balanceGauge.Labels(account.HolderName, account.CurrencyType, account.CardType, account.CreditLimit.ToString(CultureInfo.InvariantCulture)).Set(balance);
+            _balanceGauge.Labels(account.HolderName, account.CurrencyType, account.CardType).Set(balance);
+            _creditLimitGauge.Labels(account.HolderName, account.CurrencyType, account.CardType).Set(account.CreditLimit);
         }
 
         public void ObserveCurrency(string currencyNameA, string currencyNameB, CurrencyObserveType type, float value)
