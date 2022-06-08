@@ -9,6 +9,8 @@ namespace MonobankExporter.BusinessLogic.Models
 
         public List<ClientInfoOptions> Clients { get; set; } = new();
         public string WebhookUrl { get; set; }
+        public string ApiBaseUrl { get; set; } = "https://api.monobank.ua/";
+
         public int ClientsRefreshTimeInMinutes
         {
             get => _clientsRefreshTimeInMinutes;
