@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 using ISO._4217;
-using MonobankExporter.Domain.Enums;
+using MonobankClient.Enums;
 
-namespace MonobankExporter.Domain.Models.Client
+namespace MonobankClient.Models
 {
     public class Account
     {

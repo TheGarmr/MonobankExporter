@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace MonobankExporter.Domain.Models.Client
+namespace MonobankClient.Models
 {
     public class UserInfo
     {

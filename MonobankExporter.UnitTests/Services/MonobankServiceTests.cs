@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Monobank.Client;
+using Monobank.Client.Enums;
+using Monobank.Client.Models;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Services;
 using MonobankExporter.Domain.Enums;
 using MonobankExporter.Domain.Models;
-using MonobankExporter.Domain.Models.Client;
 using MonobankExporter.Domain.Options;
 using Moq;
 using Xunit;
@@ -17,25 +19,19 @@ namespace MonobankExporter.UnitTests.Services
 {
     public class MonobankServiceTests
     {
-        private readonly Mock<IMonoClient> _monoClientMock;
         private readonly Mock<IMetricsExporterService> _metricsExporterMock;
         private readonly Mock<ILookupsMemoryCache> _cacheServiceMock;
         private readonly Mock<ILogger<MonobankService>> _loggerMock;
-        private readonly Mock<IMonobankCurrencyClient> _currencyClientMock;
-        private readonly Mock<IMonobankServiceClient> _monobankServiceClientMock;
+        private readonly Mock<IMonobankClient> _monobankClientMock;
 
         private AccountInfo _tryGetResult;
 
         public MonobankServiceTests()
         {
-            _monoClientMock = new Mock<IMonoClient>();
             _metricsExporterMock = new Mock<IMetricsExporterService>();
             _cacheServiceMock = new Mock<ILookupsMemoryCache>();
             _loggerMock = new Mock<ILogger<MonobankService>>();
-            _currencyClientMock = new Mock<IMonobankCurrencyClient>();
-            _monobankServiceClientMock = new Mock<IMonobankServiceClient>();
-            _monoClientMock.SetupGet(x => x.Currency).Returns(_currencyClientMock.Object);
-            _monoClientMock.SetupGet(x => x.Client).Returns(_monobankServiceClientMock.Object);
+            _monobankClientMock = new Mock<IMonobankClient>();
         }
 
         #region WebHookUrlIsValid
@@ -217,7 +213,8 @@ namespace MonobankExporter.UnitTests.Services
             await service.SetupWebHookForUsersAsync("https://example.com", null, CancellationToken.None);
 
             // Assert
-            _monoClientMock.VerifyGet(x => x.Client, Times.Never);
+            _monobankClientMock.Verify(x => x.SetWebhookAsync(It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -232,7 +229,8 @@ namespace MonobankExporter.UnitTests.Services
             await service.SetupWebHookForUsersAsync(webhookUrl, clients, CancellationToken.None);
 
             // Assert
-            _monoClientMock.VerifyGet(x => x.Client, Times.Never);
+            _monobankClientMock.Verify(x => x.SetWebhookAsync(It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -254,7 +252,7 @@ namespace MonobankExporter.UnitTests.Services
             // Assert
             clients.ForEach(client =>
             {
-                _monobankServiceClientMock
+                _monobankClientMock
                     .Verify(x => x.SetWebhookAsync(webhookUrl, client.Token, It.IsAny<CancellationToken>()),
                         Times.Once);
             });
@@ -274,7 +272,7 @@ namespace MonobankExporter.UnitTests.Services
             await service.ExportMetricsForUsersAsync(true, null, CancellationToken.None);
 
             // Assert
-            _monoClientMock.VerifyGet(x => x.Client, Times.Never);
+            _monobankClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
@@ -288,7 +286,7 @@ namespace MonobankExporter.UnitTests.Services
             await service.ExportMetricsForUsersAsync(true, clients, CancellationToken.None);
 
             // Assert
-            _monoClientMock.VerifyGet(x => x.Client, Times.Never);
+            _monobankClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Theory]
@@ -304,7 +302,7 @@ namespace MonobankExporter.UnitTests.Services
             await service.ExportMetricsForUsersAsync(true, clients, CancellationToken.None);
 
             // Assert
-            _monobankServiceClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(),
+            _monobankClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
             _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(),
                 It.IsAny<double>()), Times.Never);
@@ -320,7 +318,7 @@ namespace MonobankExporter.UnitTests.Services
             var accountId = Guid.NewGuid().ToString();
             var client = GetValidClient(accountId);
             var clients = new List<ClientInfoOptions> { new () { Token = token } };
-            _monobankServiceClientMock
+            _monobankClientMock
                 .Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(client);
 
@@ -330,7 +328,7 @@ namespace MonobankExporter.UnitTests.Services
             await service.ExportMetricsForUsersAsync(true, clients, CancellationToken.None);
 
             // Assert
-            _monobankServiceClientMock.Verify(x => x.GetClientInfoAsync(token,
+            _monobankClientMock.Verify(x => x.GetClientInfoAsync(token,
                 It.IsAny<CancellationToken>()), Times.Once);
             foreach (var account in client.Accounts)
             {
@@ -347,7 +345,7 @@ namespace MonobankExporter.UnitTests.Services
             var accountId = Guid.NewGuid().ToString();
             var client = GetValidClient(accountId);
             var clients = new List<ClientInfoOptions> { new() { Token = token } };
-            _monobankServiceClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
+            _monobankClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(client);
 
             var service = GetService();
@@ -371,7 +369,7 @@ namespace MonobankExporter.UnitTests.Services
             var accountId = Guid.NewGuid().ToString();
             var client = GetValidClient(accountId);
             var clients = new List<ClientInfoOptions> { new () { Token = token } };
-            _monobankServiceClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
+            _monobankClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(client);
 
             var service = GetService();
@@ -393,7 +391,7 @@ namespace MonobankExporter.UnitTests.Services
             var nameFromConfig = "John Wick";
             var client = GetValidClient(accountId, name: "John Doe");
             var clients = new List<ClientInfoOptions> { new () { Token = token, Name = nameFromConfig } };
-            _monobankServiceClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
+            _monobankClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(client);
             AccountInfo expectedAccount = null;
             _metricsExporterMock.Setup(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()))
@@ -417,7 +415,7 @@ namespace MonobankExporter.UnitTests.Services
         public async Task ExportCurrenciesMetricsAsyncShouldNotCallExporterServiceIfMetricsCollectionIsNull()
         {
             // Arrange
-            _currencyClientMock.Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
+            _monobankClientMock.Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => null);
             var service = GetService();
 
@@ -434,7 +432,7 @@ namespace MonobankExporter.UnitTests.Services
         {
             // Arrange
             var currencies = new List<CurrencyInfo>();
-            _currencyClientMock.Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
+            _monobankClientMock.Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(currencies);
             var service = GetService();
 
@@ -462,7 +460,7 @@ namespace MonobankExporter.UnitTests.Services
                     RateSell = 100.12f
                 }
             };
-            _currencyClientMock.Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
+            _monobankClientMock.Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(currencies);
             var service = GetService();
 
@@ -497,7 +495,7 @@ namespace MonobankExporter.UnitTests.Services
                     RateSell = 0
                 }
             };
-            _currencyClientMock.Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
+            _monobankClientMock.Setup(x => x.GetCurrenciesAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(currencies);
             var service = GetService();
 
@@ -523,7 +521,7 @@ namespace MonobankExporter.UnitTests.Services
         private MonobankService GetService(MonobankExporterOptions options = null)
         {
             options ??= new MonobankExporterOptions();
-            return new MonobankService(options, _monoClientMock.Object, _metricsExporterMock.Object, _cacheServiceMock.Object, _loggerMock.Object);
+            return new MonobankService(options, _monobankClientMock.Object, _metricsExporterMock.Object, _cacheServiceMock.Object, _loggerMock.Object);
         }
 
         private static UserInfo GetValidClient(string accountId = null, string name = "John Doe", short countOfAccounts = 2)

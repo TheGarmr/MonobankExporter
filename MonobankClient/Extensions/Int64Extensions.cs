@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MonobankExporter.Domain.Extensions
+namespace MonobankClient.Extensions
 {
     public static class Int64Extensions
     {

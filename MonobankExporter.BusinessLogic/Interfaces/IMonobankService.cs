@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using MonobankExporter.Domain.Models.Client;
+using Monobank.Client.Models;
 using MonobankExporter.Domain.Options;
 
 namespace MonobankExporter.BusinessLogic.Interfaces

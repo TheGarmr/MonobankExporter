@@ -5,29 +5,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Monobank.Client;
+using Monobank.Client.Models;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.Domain.Enums;
 using MonobankExporter.Domain.Models;
-using MonobankExporter.Domain.Models.Client;
 using MonobankExporter.Domain.Options;
 
 namespace MonobankExporter.BusinessLogic.Services
 {
     public class MonobankService : IMonobankService
     {
-        private readonly IMonoClient _client;
+        private readonly IMonobankClient _monobankClient;
         private readonly ILookupsMemoryCache _cacheService;
         private readonly IMetricsExporterService _metricsExporter;
         private readonly ILogger<MonobankService> _logger;
         private readonly MemoryCacheEntryOptions _cacheOptions;
 
         public MonobankService(MonobankExporterOptions options,
-            IMonoClient monoClient,
+            IMonobankClient monobankClient,
             IMetricsExporterService metricsExporterService,
             ILookupsMemoryCache cacheService,
             ILogger<MonobankService> logger)
         {
-            _client = monoClient;
+            _monobankClient = monobankClient;
             _metricsExporter = metricsExporterService;
             _cacheService = cacheService;
             _logger = logger;
@@ -63,7 +64,7 @@ namespace MonobankExporter.BusinessLogic.Services
             {
                 foreach (var client in clients)
                 {
-                    await _client.Client.SetWebhookAsync(webHookUrl, client.Token, stoppingToken);
+                    await _monobankClient.SetWebhookAsync(webHookUrl, client.Token, stoppingToken);
                 }
 
                 _logger.LogInformation("The setup of the webhook was successful.");
@@ -78,7 +79,7 @@ namespace MonobankExporter.BusinessLogic.Services
         {
             try
             {
-                var currencies = await _client.Currency.GetCurrenciesAsync(stoppingToken);
+                var currencies = await _monobankClient.GetCurrenciesAsync(stoppingToken);
 
                 var currenciesToObserve = currencies.Where(x =>
                     !string.IsNullOrWhiteSpace(x.CurrencyNameA) && !string.IsNullOrWhiteSpace(x.CurrencyNameB));
@@ -142,7 +143,7 @@ namespace MonobankExporter.BusinessLogic.Services
                     return;
                 }
 
-                var userInfo = await _client.Client.GetClientInfoAsync(clientInfo.Token, stoppingToken);
+                var userInfo = await _monobankClient.GetClientInfoAsync(clientInfo.Token, stoppingToken);
                 if (!string.IsNullOrWhiteSpace(clientInfo.Name))
                 {
                     _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");

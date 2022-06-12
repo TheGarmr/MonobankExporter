@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace MonobankExporter.Domain.Enums
+namespace MonobankClient.Enums
 {
     [JsonConverter(typeof(JsonStringEnumMemberConverter))]
     public enum CashbackType

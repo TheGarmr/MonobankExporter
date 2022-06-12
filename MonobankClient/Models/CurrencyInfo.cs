@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using ISO._4217;
 
-namespace MonobankExporter.Domain.Models.Client
+namespace MonobankClient.Models
 {
     public sealed class CurrencyInfo
     {

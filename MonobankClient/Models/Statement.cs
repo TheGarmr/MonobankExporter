@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using ISO._4217;
-using MonobankExporter.Domain.Extensions;
+using MonobankClient.Extensions;
 
-namespace MonobankExporter.Domain.Models.Client
+namespace MonobankClient.Models
 {
     public class Statement
     {

@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Monobank.Client;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Services;
 using MonobankExporter.BusinessLogic.Workers;
 using MonobankExporter.Domain.Options;
+using Monobank.Client.Extensions;
 using Serilog;
 using Serilog.Events;
 
@@ -33,7 +35,6 @@ namespace MonobankExporter.API.Extensions
         internal static IServiceCollection AddMonobankService(this IServiceCollection services)
         {
             services.AddScoped<IMonobankService, MonobankService>();
-            services.AddScoped<IMonoClient, MonoClient>();
             return services;
         }
 
@@ -48,6 +49,13 @@ namespace MonobankExporter.API.Extensions
         {
             var options = configuration.GetSection("basic-auth").Get<BasicAuthOptions>() ?? new BasicAuthOptions();
             services.AddSingleton(options);
+            return services;
+        }
+
+        internal static IServiceCollection AddMonobankClient(this IServiceCollection services, IConfiguration configuration)
+        {
+            var options = configuration.GetSection("monobank-exporter").Get<MonobankExporterOptions>() ?? new MonobankExporterOptions();
+            services.AddMonobankClient(new MonobankClientOptions { ApiBaseUrl = options.ApiBaseUrl });
             return services;
         }
 
