@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,12 @@ namespace MonobankExporter.BusinessLogic.Workers
         {
             return Task.Run(async () =>
             {
+                if (!_options.Clients.Any())
+                {
+                    _logger.LogWarning("List of clients is empty. Metrics could not be exported.");
+                    return;
+                }
+
                 var webHookWasSet = await SetupWebHook(stoppingToken);
                 while (!stoppingToken.IsCancellationRequested)
                 {
