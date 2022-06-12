@@ -6,7 +6,6 @@ LABEL url=https://github.com/TheGarmr/monobank-exporter
 
 WORKDIR /etc/monobank-exporter
 
-COPY ["MonobankExporter.Domain/MonobankExporter.Domain.csproj", "MonobankExporter.Domain/"]
 COPY ["MonobankExporter.BusinessLogic/MonobankExporter.BusinessLogic.csproj", "MonobankExporter.BusinessLogic/"]
 COPY ["MonobankExporter.API/MonobankExporter.API.csproj", "MonobankExporter.API/"]
 
