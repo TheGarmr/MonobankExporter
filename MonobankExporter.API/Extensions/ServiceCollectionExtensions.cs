@@ -54,8 +54,8 @@ namespace MonobankExporter.API.Extensions
 
         internal static IServiceCollection AddMonobankClient(this IServiceCollection services, IConfiguration configuration)
         {
-            var options = configuration.GetSection("monobank-exporter").Get<MonobankExporterOptions>() ?? new MonobankExporterOptions();
-            services.AddMonobankClient(new MonobankClientOptions { ApiBaseUrl = options.ApiBaseUrl });
+            var options = configuration.GetSection("monobank-api").Get<MonobankClientOptions>() ?? new MonobankClientOptions();
+            services.AddMonobankClient(options);
             return services;
         }
 
