@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Models;
+using MonobankExporter.BusinessLogic.Options;
 
 namespace MonobankExporter.BusinessLogic.Workers
 {
@@ -28,13 +29,19 @@ namespace MonobankExporter.BusinessLogic.Workers
         {
             return Task.Run(async () =>
             {
+                if (!_options.Clients.Any())
+                {
+                    _logger.LogWarning("List of clients is empty. Metrics could not be exported.");
+                    return;
+                }
+
                 var webHookWasSet = await SetupWebHook(stoppingToken);
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     try
                     {
                         stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportUsersMetrics(webHookWasSet, stoppingToken);
+                        await _monobankService.ExportMetricsForUsersAsync(webHookWasSet, _options.Clients, stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {
@@ -56,7 +63,7 @@ namespace MonobankExporter.BusinessLogic.Workers
             if (webhookWillBeUsed)
             {
                 _logger.LogInformation("Webhook url is valid. Trying to setup it.");
-                await _monobankService.SetupWebHookForUsers(_options.WebhookUrl, _options.Clients, cancellationToken);
+                await _monobankService.SetupWebHookForUsersAsync(_options.WebhookUrl, _options.Clients, cancellationToken);
             }
 
             return webhookWillBeUsed;

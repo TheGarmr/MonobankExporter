@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Models;
+using MonobankExporter.BusinessLogic.Options;
 
 namespace MonobankExporter.BusinessLogic.Workers
 {
@@ -33,7 +33,7 @@ namespace MonobankExporter.BusinessLogic.Workers
                     try
                     {
                         stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportCurrenciesMetrics(stoppingToken);
+                        await _monobankService.ExportMetricsForCurrenciesAsync(stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {

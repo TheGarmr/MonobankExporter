@@ -5,29 +5,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Monobank.Core;
-using Monobank.Core.Models;
+using Monobank.Client;
+using Monobank.Client.Models;
+using MonobankExporter.BusinessLogic.Enums;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Models;
+using MonobankExporter.BusinessLogic.Options;
 
 namespace MonobankExporter.BusinessLogic.Services
 {
     public class MonobankService : IMonobankService
     {
-        private readonly MonoClient _client;
-        private readonly MonobankExporterOptions _options;
+        private readonly IMonobankClient _monobankClient;
         private readonly ILookupsMemoryCache _cacheService;
         private readonly IMetricsExporterService _metricsExporter;
         private readonly ILogger<MonobankService> _logger;
         private readonly MemoryCacheEntryOptions _cacheOptions;
 
         public MonobankService(MonobankExporterOptions options,
+            IMonobankClient monobankClient,
             IMetricsExporterService metricsExporterService,
             ILookupsMemoryCache cacheService,
             ILogger<MonobankService> logger)
         {
-            _client = new MonoClient();
-            _options = options;
+            _monobankClient = monobankClient;
             _metricsExporter = metricsExporterService;
             _cacheService = cacheService;
             _logger = logger;
@@ -37,18 +38,25 @@ namespace MonobankExporter.BusinessLogic.Services
             };
         }
 
-        public async Task ExportUsersMetrics(bool storeToCache, CancellationToken stoppingToken)
+        public async Task ExportMetricsForUsersAsync(bool storeToCache, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
         {
-            foreach (var clientInfo in _options.Clients)
+            if (clients == null || !clients.Any())
+            {
+                _logger.LogWarning("List of clients is empty. Metrics could not be exported.");
+                return;
+            }
+
+            foreach (var clientInfo in clients)
             {
                 await ExportMetricsForUser(storeToCache, clientInfo, stoppingToken);
             }
         }
 
-        public async Task SetupWebHookForUsers(string webHookUrl, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
+        public async Task SetupWebHookForUsersAsync(string webHookUrl, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
         {
             if (clients == null || !clients.Any())
             {
+                _logger.LogWarning("List of clients is empty. Webhook could not be set.");
                 return;
             }
 
@@ -56,7 +64,7 @@ namespace MonobankExporter.BusinessLogic.Services
             {
                 foreach (var client in clients)
                 {
-                    await _client.Client.SetWebhookAsync(webHookUrl, client.Token, stoppingToken);
+                    await _monobankClient.SetWebhookAsync(webHookUrl, client.Token, stoppingToken);
                 }
 
                 _logger.LogInformation("The setup of the webhook was successful.");
@@ -67,11 +75,11 @@ namespace MonobankExporter.BusinessLogic.Services
             }
         }
 
-        public async Task ExportCurrenciesMetrics(CancellationToken stoppingToken)
+        public async Task ExportMetricsForCurrenciesAsync(CancellationToken stoppingToken)
         {
             try
             {
-                var currencies = await _client.Currency.GetCurrencies(stoppingToken);
+                var currencies = await _monobankClient.GetCurrenciesAsync(stoppingToken);
 
                 var currenciesToObserve = currencies.Where(x =>
                     !string.IsNullOrWhiteSpace(x.CurrencyNameA) && !string.IsNullOrWhiteSpace(x.CurrencyNameB));
@@ -99,7 +107,7 @@ namespace MonobankExporter.BusinessLogic.Services
             }
         }
 
-        public void ExportMetricsForWebHook(WebHookModel webhook, CancellationToken stoppingToken)
+        public void ExportMetricsOnWebHook(WebHook webhook, CancellationToken stoppingToken)
         {
             _logger.LogInformation($"A webHook received. Card: {webhook?.Data?.Account}...");
             try
@@ -110,7 +118,7 @@ namespace MonobankExporter.BusinessLogic.Services
                     return;
                 }
 
-                if (!_cacheService.TryGetValue(CacheType.AccountInfo, webhook.Data.Account, out AccountInfoModel accountInfo))
+                if (!_cacheService.TryGetValue(CacheType.AccountInfo, webhook.Data.Account, out AccountInfo accountInfo))
                 {
                     _logger.LogWarning($"The cache doesn't contain a record with account info. Metrics won't be exposed. Card: {webhook.Data.Account}...");
                     return;
@@ -135,7 +143,7 @@ namespace MonobankExporter.BusinessLogic.Services
                     return;
                 }
 
-                var userInfo = await _client.Client.GetClientInfoAsync(clientInfo.Token, stoppingToken);
+                var userInfo = await _monobankClient.GetClientInfoAsync(clientInfo.Token, stoppingToken);
                 if (!string.IsNullOrWhiteSpace(clientInfo.Name))
                 {
                     _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
@@ -144,7 +152,7 @@ namespace MonobankExporter.BusinessLogic.Services
 
                 foreach (var account in userInfo.Accounts)
                 {
-                    var accountInfo = new AccountInfoModel
+                    var accountInfo = new AccountInfo
                     {
                         HolderName = userInfo.Name,
                         CurrencyType = account.CurrencyName,
@@ -171,7 +179,6 @@ namespace MonobankExporter.BusinessLogic.Services
             if (string.IsNullOrWhiteSpace(webHookUrl))
             {
                 _logger.LogWarning("The webhook url is empty.");
-
                 return false;
             }
 
@@ -181,28 +188,24 @@ namespace MonobankExporter.BusinessLogic.Services
             if (!isUrl)
             {
                 _logger.LogWarning("The webhook url has bad format.");
-
                 return false;
             }
 
             if (uriResult.Scheme != Uri.UriSchemeHttp && uriResult.Scheme != Uri.UriSchemeHttps)
             {
                 _logger.LogWarning("The webhook url does not contain HTTP or HTTPS.");
-
                 return false;
             }
 
             if (!uriResult.AbsoluteUri.Contains("."))
             {
                 _logger.LogWarning("The webhook url does not dot in the address. It seems like it's not a domain.");
-
                 return false;
             }
 
             if (!uriResult.AbsoluteUri.EndsWith("/webhook"))
             {
                 _logger.LogWarning("The webhook url does not ends with the '/webhook' path.");
-
                 return false;
             }
 

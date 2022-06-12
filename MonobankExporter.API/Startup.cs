@@ -24,6 +24,7 @@ namespace MonobankExporter.API
             services.AddMetricsExporters();
             services.AddMonobankExporterOptions(Configuration);
             services.AddMonobankService();
+            services.AddMonobankClient(Configuration);
             services.AddBackgroundWorkers();
             services.AddBasicAuthOptions(Configuration);
         }

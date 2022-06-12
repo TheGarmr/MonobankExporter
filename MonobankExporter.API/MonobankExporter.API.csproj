@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-		<AssemblyVersion>1.5.1.0</AssemblyVersion>
+		<AssemblyVersion>1.6.0.0</AssemblyVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,7 +16,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Monobank.Core\Monobank.Core.csproj" />
 		<ProjectReference Include="..\MonobankExporter.BusinessLogic\MonobankExporter.BusinessLogic.csproj" />
 	</ItemGroup>
 

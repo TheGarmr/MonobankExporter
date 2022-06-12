@@ -1,4 +1,4 @@
-﻿namespace MonobankExporter.BusinessLogic.Models
+﻿namespace MonobankExporter.BusinessLogic.Options
 {
     public class BasicAuthOptions
     {
