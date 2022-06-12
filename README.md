@@ -76,17 +76,19 @@ Compose up!<br/>
 ## Config file example
 ```yaml
 monobank-exporter:
-  clients:
+  clients: #optional
     - name: "John"
       token: "yourToken"
     - name: "Briana"
       token: "yourToken"
-  webhookUrl: "http://yourUrl/webhook"
-  clientsRefreshTimeInMinutes: 60
-  currenciesRefreshTimeInMinutes: 720
-basic-auth:
+  webhookUrl: "http://yourUrl/webhook" #optional
+  clientsRefreshTimeInMinutes: 60 #optional
+  currenciesRefreshTimeInMinutes: 720 #optional
+basic-auth: #optional
   username: "admin"
   password: "admin"
+monobank-api: #optional
+  apiBaseUrl: "https://api.monobank.ua"
 ```
 # What's new
   * v1.1 - Added ability to set up basic auth for the `metrics` endpoint.
@@ -99,3 +101,6 @@ basic-auth:
            Added some labels to the Dockerfile.<br/>
   * v1.5 - Removed Redis dependency with IMemoryCache. Small refactoring of library for monobank client
   * v1.5.1 - Hotfix of webhook publishing
+  * v1.6 - Refactored project. Added small features. Added newly created package for HTTP client.<br/>
+           You can add an API url settings section if it will change.<br>
+           Simply add the `monobank-api` section with the `ApiBaseUrl`  property. Currently, it uses the `https://api.monobank.ua` url by default.
