@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Monobank.Client.Models;
-using MonobankExporter.Domain.Options;
+using MonobankExporter.BusinessLogic.Options;
 
 namespace MonobankExporter.BusinessLogic.Interfaces
 {

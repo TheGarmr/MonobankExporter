@@ -3,7 +3,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using MonobankExporter.Domain.Options;
+using MonobankExporter.BusinessLogic.Options;
 
 namespace MonobankExporter.API.Middleware
 {

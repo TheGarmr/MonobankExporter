@@ -1,5 +1,5 @@
-﻿using MonobankExporter.Domain.Enums;
-using MonobankExporter.Domain.Models;
+﻿using MonobankExporter.BusinessLogic.Enums;
+using MonobankExporter.BusinessLogic.Models;
 
 namespace MonobankExporter.BusinessLogic.Interfaces
 {

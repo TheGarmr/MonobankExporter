@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.Domain.Options;
+using MonobankExporter.BusinessLogic.Options;
 
 namespace MonobankExporter.BusinessLogic.Workers
 {

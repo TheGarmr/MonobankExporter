@@ -4,8 +4,8 @@ using Monobank.Client;
 using MonobankExporter.BusinessLogic.Interfaces;
 using MonobankExporter.BusinessLogic.Services;
 using MonobankExporter.BusinessLogic.Workers;
-using MonobankExporter.Domain.Options;
 using Monobank.Client.Extensions;
+using MonobankExporter.BusinessLogic.Options;
 using Serilog;
 using Serilog.Events;
 

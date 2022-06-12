@@ -1,4 +1,4 @@
-﻿namespace MonobankExporter.Domain.Options
+﻿namespace MonobankExporter.BusinessLogic.Options
 {
     public class ClientInfoOptions
     {

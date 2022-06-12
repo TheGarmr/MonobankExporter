@@ -1,6 +1,6 @@
-﻿using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.Domain.Enums;
-using MonobankExporter.Domain.Models;
+﻿using MonobankExporter.BusinessLogic.Enums;
+using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.BusinessLogic.Models;
 using Prometheus;
 
 namespace MonobankExporter.BusinessLogic.Services

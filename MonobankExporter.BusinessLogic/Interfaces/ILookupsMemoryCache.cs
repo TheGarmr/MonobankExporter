@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using MonobankExporter.Domain.Enums;
+using MonobankExporter.BusinessLogic.Enums;
 
 namespace MonobankExporter.BusinessLogic.Interfaces
 {

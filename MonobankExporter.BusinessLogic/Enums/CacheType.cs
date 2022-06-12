@@ -1,4 +1,4 @@
-﻿namespace MonobankExporter.Domain.Enums
+﻿namespace MonobankExporter.BusinessLogic.Enums
 {
     public enum CacheType
     {
