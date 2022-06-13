@@ -21,6 +21,8 @@ namespace MonobankExporter.API.Extensions
 
         internal static IServiceCollection AddMetricsExporters(this IServiceCollection services)
         {
+            var options = new MetricsExporterOptions();
+            services.AddSingleton(options);
             services.AddSingleton<IMetricsExporterService, PrometheusExporterService>();
             return services;
         }
