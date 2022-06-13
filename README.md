@@ -103,4 +103,5 @@ monobank-api: #optional
   * v1.5.1 - Hotfix of webhook publishing
   * v1.6 - Refactored project. Added small features. Added newly created package for HTTP client.<br/>
            You can add an API url settings section if it will change.<br>
-           Simply add the `monobank-api` section with the `ApiBaseUrl`  property. Currently, it uses the `https://api.monobank.ua` url by default.
+           Simply add the `monobank-api` section with the `ApiBaseUrl`  property. Currently, it uses the `https://api.monobank.ua` url by default.<br/>
+           Deleted the `credit_limit` field from the `monobank_balance`. Instead of this `credit_limit` will be exposed as a separate metric.
