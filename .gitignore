@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 MonobankExporter.API/monobank-exporter.yml
+MonobankExporter.API/monobank-exporter.*.yml
