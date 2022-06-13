@@ -25,6 +25,15 @@
   * `/webhook` ending is mandatory
   * basic auth is not required. it can be added from the config
 
+### Metrics
+| Metric name               | Description                             |
+| ------------------------- | --------------------------------------- |
+| monobank_balance          | Show current balance for each card      |
+| monobank_credit_limit     | Show current credit limit for each card |
+| monobank_currencies_buy   | Shows currencies rate for buy           |
+| monobank_currencies_sell  | Shows currencies rate for sell          |
+| monobank_currencies_cross | Shows currencies rate for cross         |
+
 Currencies metrics will be provisioned in any case.<br/>
 The client's metrics will be provisioned only in the case of the existing token.<br/>
 Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<br/>
