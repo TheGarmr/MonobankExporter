@@ -1,6 +1,6 @@
 ﻿namespace MonobankExporter.BusinessLogic.Models
 {
-    public class AccountInfoModel
+    public class AccountInfo
     {
         public string HolderName { get; set; }
         public string CurrencyType { get; set; }

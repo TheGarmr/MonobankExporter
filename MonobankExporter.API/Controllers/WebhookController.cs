@@ -1,7 +1,6 @@
 ﻿using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Monobank.Core.Models;
+using Monobank.Client.Models;
 using MonobankExporter.BusinessLogic.Interfaces;
 
 namespace MonobankExporter.API.Controllers
@@ -17,10 +16,16 @@ namespace MonobankExporter.API.Controllers
             _monobankService = webHookService;
         }
 
-        [HttpPost]
-        public async Task<ActionResult> Webhook([FromBody] WebHookModel webhook, CancellationToken stoppingToken)
+        [HttpGet]
+        public IActionResult Webhook()
         {
-            await _monobankService.ExportMetricsForWebHook(webhook, stoppingToken);
+            return Ok();
+        }
+
+        [HttpPost]
+        public ActionResult Webhook([FromBody] WebHook webhook, CancellationToken stoppingToken)
+        {
+            _monobankService.ExportMetricsOnWebHook(webhook, stoppingToken);
             return Ok();
         }
     }

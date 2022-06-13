@@ -18,12 +18,13 @@ namespace MonobankExporter.API
         public void ConfigureServices(IServiceCollection services)
         {
             var logger = Serilog.Log.Logger = services.AddLogger();
-            logger.Information($"running monobank-exporter. version {GetType().Assembly.GetName().Version}");
+            logger.Information($"Running monobank-exporter v{GetType().Assembly.GetName().Version}");
             services.AddControllers();
-            services.AddRedisCache(Configuration);
-            services.AddPrometheusExporter();
+            services.AddCache();
+            services.AddMetricsExporters();
             services.AddMonobankExporterOptions(Configuration);
             services.AddMonobankService();
+            services.AddMonobankClient(Configuration);
             services.AddBackgroundWorkers();
             services.AddBasicAuthOptions(Configuration);
         }
