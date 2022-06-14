@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS publish
 
-LABEL version="1.4"
+LABEL version="1.6.1"
 LABEL maintainer=TheGarmr
 LABEL url=https://github.com/TheGarmr/monobank-exporter
 
