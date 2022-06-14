@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Monobank.Client;
 using MonobankExporter.BusinessLogic.Interfaces;
@@ -8,6 +9,7 @@ using Monobank.Client.Extensions;
 using MonobankExporter.BusinessLogic.Options;
 using Serilog;
 using Serilog.Events;
+using Serilog.Filters;
 
 namespace MonobankExporter.API.Extensions
 {
@@ -29,7 +31,7 @@ namespace MonobankExporter.API.Extensions
 
         internal static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
         {
-            services.AddHostedService<BalanceWorker>();
+            //services.AddHostedService<BalanceWorker>();
             services.AddHostedService<CurrenciesWorker>();
             return services;
         }
@@ -65,6 +67,7 @@ namespace MonobankExporter.API.Extensions
         {
             return new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
                 .MinimumLevel.Information()
                 .WriteTo.Console()
                 .WriteTo.File("/var/log/monobank-exporter.log")
