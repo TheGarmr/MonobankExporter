@@ -38,7 +38,46 @@ namespace MonobankExporter.BusinessLogic.Services
             };
         }
 
-        public async Task ExportMetricsForUsersAsync(bool storeToCache, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
+        public async Task SetupWebHookAndExportMetricsForUsersAsync(string webHookUrl, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
+        {
+            if (clients == null || !clients.Any())
+            {
+                _logger.LogWarning("List of clients is empty. Metrics could not be exported.");
+                return;
+            }
+
+            var webHookUrlIsValid = WebHookUrlIsValid(webHookUrl);
+
+            foreach (var clientInfo in clients)
+            {
+                if (string.IsNullOrWhiteSpace(clientInfo?.Token))
+                {
+                    _logger.LogError($"Could not expose metrics for client: {clientInfo?.Name}. Token is empty.");
+                    continue;
+                }
+
+                var userInfo = await _monobankClient.GetClientInfoAsync(clientInfo.Token, stoppingToken);
+                if (!string.IsNullOrWhiteSpace(clientInfo.Name))
+                {
+                    _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
+                    userInfo.Name = clientInfo.Name;
+                }
+
+                if (webHookUrlIsValid)
+                { 
+                    var webhookWasSet = await _monobankClient.SetWebhookAsync(webHookUrl, clientInfo.Token, stoppingToken);
+                    if (webhookWasSet)
+                    {
+                        _logger.LogInformation($"The webhook url for {userInfo.Name} was set successfully");
+                        userInfo.WebHookUrl = webHookUrl;
+                    }
+                }
+
+                ExportMetricsForUser(clientInfo, userInfo);
+            }
+        }
+
+        public async Task ExportMetricsForUsersAsync(List<ClientInfoOptions> clients, CancellationToken stoppingToken)
         {
             if (clients == null || !clients.Any())
             {
@@ -48,30 +87,19 @@ namespace MonobankExporter.BusinessLogic.Services
 
             foreach (var clientInfo in clients)
             {
-                await ExportMetricsForUser(storeToCache, clientInfo, stoppingToken);
-            }
-        }
-
-        public async Task SetupWebHookForUsersAsync(string webHookUrl, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
-        {
-            if (clients == null || !clients.Any())
-            {
-                _logger.LogWarning("List of clients is empty. Webhook could not be set.");
-                return;
-            }
-
-            try
-            {
-                foreach (var client in clients)
+                if (string.IsNullOrWhiteSpace(clientInfo?.Token))
                 {
-                    await _monobankClient.SetWebhookAsync(webHookUrl, client.Token, stoppingToken);
+                    _logger.LogError($"Could not expose metrics for client: {clientInfo?.Name}. Token is empty.");
+                    continue;
                 }
 
-                _logger.LogInformation("The setup of the webhook was successful.");
-            }
-            catch
-            {
-                _logger.LogError($"The setup of the webhook for users unexpectedly failed. Url: {webHookUrl}");
+                var userInfo = await _monobankClient.GetClientInfoAsync(clientInfo.Token, stoppingToken);
+                if (!string.IsNullOrWhiteSpace(clientInfo.Name))
+                {
+                    _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
+                    userInfo.Name = clientInfo.Name;
+                }
+                ExportMetricsForUser(clientInfo, userInfo);
             }
         }
 
@@ -133,23 +161,10 @@ namespace MonobankExporter.BusinessLogic.Services
             }
         }
 
-        private async Task ExportMetricsForUser(bool storeToCache, ClientInfoOptions clientInfo, CancellationToken stoppingToken)
+        private void ExportMetricsForUser(ClientInfoOptions clientInfo, UserInfo userInfo)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(clientInfo?.Token))
-                {
-                    _logger.LogError($"Could not expose metrics for client: {clientInfo?.Name}. Token is empty.");
-                    return;
-                }
-
-                var userInfo = await _monobankClient.GetClientInfoAsync(clientInfo.Token, stoppingToken);
-                if (!string.IsNullOrWhiteSpace(clientInfo.Name))
-                {
-                    _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
-                    userInfo.Name = clientInfo.Name;
-                }
-
                 foreach (var account in userInfo.Accounts)
                 {
                     var accountInfo = new AccountInfo
@@ -161,7 +176,7 @@ namespace MonobankExporter.BusinessLogic.Services
                     };
 
                     _metricsExporter.ObserveAccount(accountInfo, account.BalanceWithoutCreditLimit);
-                    if (storeToCache)
+                    if (!string.IsNullOrWhiteSpace(userInfo.WebHookUrl))
                     {
                         _cacheService.Set(CacheType.AccountInfo, account.Id, accountInfo, _cacheOptions);
                     }

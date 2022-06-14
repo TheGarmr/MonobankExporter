@@ -35,13 +35,15 @@ namespace MonobankExporter.BusinessLogic.Workers
                     return;
                 }
 
-                var webHookWasSet = await SetupWebHook(stoppingToken);
+                await _monobankService.SetupWebHookAndExportMetricsForUsersAsync(_options.WebhookUrl, _options.Clients, stoppingToken);
+                Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
+
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     try
                     {
                         stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportMetricsForUsersAsync(webHookWasSet, _options.Clients, stoppingToken);
+                        await _monobankService.ExportMetricsForUsersAsync(_options.Clients, stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {
@@ -55,18 +57,6 @@ namespace MonobankExporter.BusinessLogic.Workers
                     Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
                 }
             }, stoppingToken);
-        }
-
-        private async Task<bool> SetupWebHook(CancellationToken cancellationToken)
-        {
-            var webhookWillBeUsed = _monobankService.WebHookUrlIsValid(_options.WebhookUrl);
-            if (webhookWillBeUsed)
-            {
-                _logger.LogInformation("Webhook url is valid. Trying to setup it.");
-                await _monobankService.SetupWebHookForUsersAsync(_options.WebhookUrl, _options.Clients, cancellationToken);
-            }
-
-            return webhookWillBeUsed;
         }
     }
 }
