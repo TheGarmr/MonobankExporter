@@ -6,7 +6,7 @@ LABEL url=https://github.com/TheGarmr/monobank-exporter
 
 WORKDIR /etc/monobank-exporter
 
-COPY ["MonobankExporter.BusinessLogic/MonobankExporter.BusinessLogic.csproj", "MonobankExporter.BusinessLogic/"]
+COPY ["MonobankExporter.Application/MonobankExporter.Application.csproj", "MonobankExporter.Application/"]
 COPY ["MonobankExporter.API/MonobankExporter.API.csproj", "MonobankExporter.API/"]
 
 RUN dotnet restore "MonobankExporter.API/MonobankExporter.API.csproj" --runtime alpine-x64

@@ -1,10 +1,10 @@
-﻿using MonobankExporter.BusinessLogic.Enums;
-using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Models;
-using MonobankExporter.BusinessLogic.Options;
+﻿using MonobankExporter.Application.Enums;
+using MonobankExporter.Application.Interfaces;
+using MonobankExporter.Application.Models;
+using MonobankExporter.Application.Options;
 using Prometheus;
 
-namespace MonobankExporter.BusinessLogic.Services
+namespace MonobankExporter.Application.Services
 {
     public class PrometheusExporterService : IMetricsExporterService
     {

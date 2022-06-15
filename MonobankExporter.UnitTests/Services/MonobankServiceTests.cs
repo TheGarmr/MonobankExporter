@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 using Monobank.Client;
 using Monobank.Client.Enums;
 using Monobank.Client.Models;
-using MonobankExporter.BusinessLogic.Enums;
-using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Models;
-using MonobankExporter.BusinessLogic.Options;
-using MonobankExporter.BusinessLogic.Services;
+using MonobankExporter.Application.Enums;
+using MonobankExporter.Application.Interfaces;
+using MonobankExporter.Application.Models;
+using MonobankExporter.Application.Options;
+using MonobankExporter.Application.Services;
 using Moq;
 using Xunit;
 using MemoryCacheEntryOptions = Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions;
@@ -19,7 +19,7 @@ namespace MonobankExporter.UnitTests.Services
 {
     public class MonobankServiceTests
     {
-        private const string validWebHookUrl = "https://example.com/webhook";
+        private const string ValidWebHookUrl = "https://example.com/webhook";
         private readonly Mock<IMetricsExporterService> _metricsExporterMock;
         private readonly Mock<ILookupsMemoryCache> _cacheServiceMock;
         private readonly Mock<ILogger<MonobankService>> _loggerMock;
@@ -211,7 +211,7 @@ namespace MonobankExporter.UnitTests.Services
             var service = GetService();
 
             // Act
-            await service.SetupWebHookAndExportMetricsForUsersAsync(validWebHookUrl, null, CancellationToken.None);
+            await service.SetupWebHookAndExportMetricsForUsersAsync(ValidWebHookUrl, null, CancellationToken.None);
 
             // Assert
             _monobankClientMock.Verify(x => x.SetWebhookAsync(It.IsAny<string>(), It.IsAny<string>(),
@@ -222,7 +222,7 @@ namespace MonobankExporter.UnitTests.Services
         public async Task SetupWebHookAndExportMetricsForUsersAsyncShouldNotCallClientIfListOfAccountsIsEmpty()
         {
             // Arrange
-            var webhookUrl = validWebHookUrl;
+            var webhookUrl = ValidWebHookUrl;
             var clients = new List<ClientInfoOptions>();
             var service = GetService();
 
@@ -238,7 +238,7 @@ namespace MonobankExporter.UnitTests.Services
         public async Task SetupWebHookAndExportMetricsForUsersAsyncShouldCallWebhookSetupIfClientsListIsValid()
         {
             // Arrange
-            var webhookUrl = validWebHookUrl;
+            var webhookUrl = ValidWebHookUrl;
             var clients = new List<ClientInfoOptions>
             {
                 new () { Token = Guid.NewGuid().ToString() },
@@ -267,7 +267,7 @@ namespace MonobankExporter.UnitTests.Services
         public async Task SetupWebHookAndExportMetricsForUsersAsyncShouldSetWebHookUrlPropertyIfWebHookIsSuccessfulll()
         {
             // Arrange
-            var webhookUrl = validWebHookUrl;
+            var webhookUrl = ValidWebHookUrl;
             var token = Guid.NewGuid().ToString();
             var clients = new List<ClientInfoOptions> { new() { Token = token } };
             var userFromApi = GetValidClient();

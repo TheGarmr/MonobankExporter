@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MonobankExporter.BusinessLogic.Options
+namespace MonobankExporter.Application.Options
 {
     public class MonobankExporterOptions
     {

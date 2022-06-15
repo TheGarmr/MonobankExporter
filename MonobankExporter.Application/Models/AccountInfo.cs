@@ -1,4 +1,4 @@
-﻿namespace MonobankExporter.BusinessLogic.Models
+﻿namespace MonobankExporter.Application.Models
 {
     public class AccountInfo
     {

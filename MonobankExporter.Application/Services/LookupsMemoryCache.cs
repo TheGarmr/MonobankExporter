@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MonobankExporter.BusinessLogic.Enums;
-using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.Application.Enums;
+using MonobankExporter.Application.Interfaces;
 
-namespace MonobankExporter.BusinessLogic.Services
+namespace MonobankExporter.Application.Services
 {
     public class LookupsMemoryCache : MemoryCache, ILookupsMemoryCache
     {

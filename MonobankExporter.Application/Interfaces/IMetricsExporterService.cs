@@ -1,7 +1,7 @@
-﻿using MonobankExporter.BusinessLogic.Enums;
-using MonobankExporter.BusinessLogic.Models;
+﻿using MonobankExporter.Application.Enums;
+using MonobankExporter.Application.Models;
 
-namespace MonobankExporter.BusinessLogic.Interfaces
+namespace MonobankExporter.Application.Interfaces
 {
     public interface IMetricsExporterService
     {

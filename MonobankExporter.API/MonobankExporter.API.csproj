@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\MonobankExporter.BusinessLogic\MonobankExporter.BusinessLogic.csproj" />
+		<ProjectReference Include="..\MonobankExporter.Application\MonobankExporter.Application.csproj" />
 	</ItemGroup>
 
 </Project>

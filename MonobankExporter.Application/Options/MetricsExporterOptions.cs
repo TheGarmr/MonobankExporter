@@ -1,4 +1,4 @@
-﻿namespace MonobankExporter.BusinessLogic.Options
+﻿namespace MonobankExporter.Application.Options
 {
     public class MetricsExporterOptions
     {

@@ -7,12 +7,12 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Monobank.Client;
 using Monobank.Client.Models;
-using MonobankExporter.BusinessLogic.Enums;
-using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Models;
-using MonobankExporter.BusinessLogic.Options;
+using MonobankExporter.Application.Enums;
+using MonobankExporter.Application.Interfaces;
+using MonobankExporter.Application.Models;
+using MonobankExporter.Application.Options;
 
-namespace MonobankExporter.BusinessLogic.Services
+namespace MonobankExporter.Application.Services
 {
     public class MonobankService : IMonobankService
     {

@@ -1,4 +1,4 @@
-﻿namespace MonobankExporter.BusinessLogic.Enums
+﻿namespace MonobankExporter.Application.Enums
 {
     public enum CurrencyObserveType
     {
