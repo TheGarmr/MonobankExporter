@@ -21,7 +21,7 @@ namespace MonobankExporter.Application.Services
             SetupMetrics();
         }
 
-        public void ObserveAccount(AccountInfo account, double balance)
+        public void ObserveAccountBalance(AccountInfo account, double balance)
         {
             _balanceGauge.Labels(account.HolderName, account.CurrencyType, account.CardType).Set(balance);
             _creditLimitGauge.Labels(account.HolderName, account.CurrencyType, account.CardType).Set(account.CreditLimit);

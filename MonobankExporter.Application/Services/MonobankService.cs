@@ -73,11 +73,11 @@ namespace MonobankExporter.Application.Services
                     }
                 }
 
-                ExportMetricsForUser(clientInfo, userInfo);
+                ExportBalanceMetricsForUser(clientInfo, userInfo);
             }
         }
 
-        public async Task ExportMetricsForUsersAsync(List<ClientInfoOptions> clients, CancellationToken stoppingToken)
+        public async Task ExportBalanceMetricsForUsersAsync(List<ClientInfoOptions> clients, CancellationToken stoppingToken)
         {
             if (clients == null || !clients.Any())
             {
@@ -99,7 +99,7 @@ namespace MonobankExporter.Application.Services
                     _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
                     userInfo.Name = clientInfo.Name;
                 }
-                ExportMetricsForUser(clientInfo, userInfo);
+                ExportBalanceMetricsForUser(clientInfo, userInfo);
             }
         }
 
@@ -152,7 +152,7 @@ namespace MonobankExporter.Application.Services
                     return;
                 }
 
-                _metricsExporter.ObserveAccount(accountInfo, webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit);
+                _metricsExporter.ObserveAccountBalance(accountInfo, webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit);
                 _logger.LogInformation($"Observed metrics by webhook for {accountInfo.HolderName}...");
             }
             catch
@@ -161,7 +161,7 @@ namespace MonobankExporter.Application.Services
             }
         }
 
-        private void ExportMetricsForUser(ClientInfoOptions clientInfo, UserInfo userInfo)
+        private void ExportBalanceMetricsForUser(ClientInfoOptions clientInfo, UserInfo userInfo)
         {
             try
             {
@@ -175,7 +175,7 @@ namespace MonobankExporter.Application.Services
                         CreditLimit = account.CreditLimitAsMoney
                     };
 
-                    _metricsExporter.ObserveAccount(accountInfo, account.BalanceWithoutCreditLimit);
+                    _metricsExporter.ObserveAccountBalance(accountInfo, account.BalanceWithoutCreditLimit);
                     if (!string.IsNullOrWhiteSpace(userInfo.WebHookUrl))
                     {
                         _cacheService.Set(CacheType.AccountInfo, account.Id, accountInfo, _cacheOptions);

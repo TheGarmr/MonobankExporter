@@ -43,7 +43,7 @@ namespace MonobankExporter.Application.Workers
                     try
                     {
                         stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportMetricsForUsersAsync(_options.Clients, stoppingToken);
+                        await _monobankService.ExportBalanceMetricsForUsersAsync(_options.Clients, stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {

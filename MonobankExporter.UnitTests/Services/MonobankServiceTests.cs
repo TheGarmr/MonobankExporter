@@ -90,7 +90,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(null, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
         }
 
@@ -108,7 +108,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
         }
 
@@ -126,7 +126,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
         }
 
@@ -144,7 +144,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
             AccountInfo result;
             _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out result), Times.Never);
         }
@@ -169,7 +169,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, account, out _tryGetResult), Times.Once);
         }
 
@@ -197,7 +197,7 @@ namespace MonobankExporter.UnitTests.Services
             service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
             // Assert
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(), expectedBalance), Times.Once);
+            _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), expectedBalance), Times.Once);
         }
 
         #endregion
@@ -275,7 +275,7 @@ namespace MonobankExporter.UnitTests.Services
             _monobankClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(clientFromApi);
             AccountInfo expectedAccount = null;
-            _metricsExporterMock.Setup(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()))
+            _metricsExporterMock.Setup(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()))
                 .Callback((AccountInfo account, double balance) => expectedAccount = account);
             var service = GetService();
 
@@ -303,7 +303,7 @@ namespace MonobankExporter.UnitTests.Services
             // Assert
             _monobankClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(),
+            _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(),
                 It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.Set(It.IsAny<CacheType>(),
                 It.IsAny<string>(), It.IsAny<AccountInfo>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Never);
@@ -339,27 +339,27 @@ namespace MonobankExporter.UnitTests.Services
         #region ExportMetricsForUsersAsync
 
         [Fact]
-        public async Task ExportMetricsForUsersAsyncShouldNotCallClientIfListOfAccountsIsNull()
+        public async Task ExportBalanceMetricsForUsersAsyncShouldNotCallClientIfListOfAccountsIsNull()
         {
             // Arrange
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForUsersAsync( null, CancellationToken.None);
+            await service.ExportBalanceMetricsForUsersAsync( null, CancellationToken.None);
 
             // Assert
             _monobankClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Fact]
-        public async Task ExportMetricsForUsersAsyncShouldNotCallClientIfListOfAccountsIsEmpty()
+        public async Task ExportBalanceMetricsForUsersAsyncShouldNotCallClientIfListOfAccountsIsEmpty()
         {
             // Arrange
             var clients = new List<ClientInfoOptions>();
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForUsersAsync(clients, CancellationToken.None);
+            await service.ExportBalanceMetricsForUsersAsync(clients, CancellationToken.None);
 
             // Assert
             _monobankClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -375,19 +375,19 @@ namespace MonobankExporter.UnitTests.Services
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForUsersAsync(clients, CancellationToken.None);
+            await service.ExportBalanceMetricsForUsersAsync(clients, CancellationToken.None);
 
             // Assert
             _monobankClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(),
                 It.IsAny<CancellationToken>()), Times.Never);
-            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(),
+            _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(),
                 It.IsAny<double>()), Times.Never);
             _cacheServiceMock.Verify(x => x.Set(It.IsAny<CacheType>(),
                 It.IsAny<string>(), It.IsAny<AccountInfo>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Never);
         }
 
         [Fact]
-        public async Task ExportMetricsForUsersAsyncShouldExportMetricsForUser()
+        public async Task ExportBalanceMetricsForUsersAsyncShouldExportMetricsForUser()
         {
             // Arrange
             var token = Guid.NewGuid().ToString();
@@ -401,20 +401,20 @@ namespace MonobankExporter.UnitTests.Services
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForUsersAsync( clients, CancellationToken.None);
+            await service.ExportBalanceMetricsForUsersAsync( clients, CancellationToken.None);
 
             // Assert
             _monobankClientMock.Verify(x => x.GetClientInfoAsync(token,
                 It.IsAny<CancellationToken>()), Times.Once);
             foreach (var account in client.Accounts)
             {
-                _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(),
+                _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(),
                     account.BalanceWithoutCreditLimit), Times.Once);
             }
         }
 
         [Fact]
-        public async Task ExportMetricsForUsersAsyncShouldStoreDataToCacheIfWebHookIsSet()
+        public async Task ExportBalanceMetricsForUsersAsyncShouldStoreDataToCacheIfWebHookIsSet()
         {
             // Arrange
             var token = Guid.NewGuid().ToString();
@@ -429,7 +429,7 @@ namespace MonobankExporter.UnitTests.Services
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForUsersAsync(clients, CancellationToken.None);
+            await service.ExportBalanceMetricsForUsersAsync(clients, CancellationToken.None);
 
             // Assert
             foreach (var account in clientFromApi.Accounts)
@@ -440,7 +440,7 @@ namespace MonobankExporter.UnitTests.Services
         }
 
         [Fact]
-        public async Task ExportMetricsForUsersAsyncShouldStoreDataToCacheIfWebHookIsNotSet()
+        public async Task ExportBalanceMetricsForUsersAsyncShouldStoreDataToCacheIfWebHookIsNotSet()
         {
             // Arrange
             var token = Guid.NewGuid().ToString();
@@ -456,7 +456,7 @@ namespace MonobankExporter.UnitTests.Services
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForUsersAsync( clients, CancellationToken.None);
+            await service.ExportBalanceMetricsForUsersAsync( clients, CancellationToken.None);
 
             // Assert
             _cacheServiceMock.Verify(x => x.Set(CacheType.AccountInfo,
@@ -464,7 +464,7 @@ namespace MonobankExporter.UnitTests.Services
         }
 
         [Fact]
-        public async Task ExportMetricsForUsersAsyncShouldUseNameFromClientsListIfProvidedForObserving()
+        public async Task ExportBalanceMetricsForUsersAsyncShouldUseNameFromClientsListIfProvidedForObserving()
         {
             // Arrange
             var token = Guid.NewGuid().ToString();
@@ -475,12 +475,12 @@ namespace MonobankExporter.UnitTests.Services
             _monobankClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(clientFromApi);
             AccountInfo expectedAccount = null;
-            _metricsExporterMock.Setup(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()))
+            _metricsExporterMock.Setup(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()))
                 .Callback((AccountInfo account, double balance) => expectedAccount = account);
             var service = GetService();
 
             // Act
-            await service.ExportMetricsForUsersAsync( clients, CancellationToken.None);
+            await service.ExportBalanceMetricsForUsersAsync( clients, CancellationToken.None);
 
             // Assert
             Assert.NotNull(expectedAccount);
