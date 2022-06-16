@@ -264,7 +264,53 @@ namespace MonobankExporter.UnitTests.Services
         }
 
         [Fact]
-        public async Task SetupWebHookAndExportMetricsForUsersAsyncShouldSetWebHookUrlPropertyIfWebHookIsSuccessfulll()
+        public async Task SetupWebHookAndExportMetricsForUsersAsyncShouldUseNameFromClientsListIfProvidedForObserving()
+        {
+            // Arrange
+            var token = Guid.NewGuid().ToString();
+            var accountId = Guid.NewGuid().ToString();
+            var nameFromConfig = "John Wick";
+            var clientFromApi = GetValidClient(accountId, name: "John Doe");
+            var clients = new List<ClientInfoOptions> { new() { Token = token, Name = nameFromConfig } };
+            _monobankClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(clientFromApi);
+            AccountInfo expectedAccount = null;
+            _metricsExporterMock.Setup(x => x.ObserveAccount(It.IsAny<AccountInfo>(), It.IsAny<double>()))
+                .Callback((AccountInfo account, double balance) => expectedAccount = account);
+            var service = GetService();
+
+            // Act
+            await service.SetupWebHookAndExportMetricsForUsersAsync(ValidWebHookUrl, clients, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(expectedAccount);
+            Assert.Equal(expectedAccount.HolderName, clientFromApi.Name);
+            Assert.Equal(expectedAccount.HolderName, nameFromConfig);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public async Task SetupWebHookAndExportMetricsForUsersAsyncShouldShouldNotExportMetricsForUserIfUserTokenIsNotValid(string token)
+        {
+            // Arrange
+            var clients = new List<ClientInfoOptions> { new() { Token = token } };
+            var service = GetService();
+
+            // Act
+            await service.SetupWebHookAndExportMetricsForUsersAsync(ValidWebHookUrl, clients, CancellationToken.None);
+
+            // Assert
+            _monobankClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(),
+                It.IsAny<CancellationToken>()), Times.Never);
+            _metricsExporterMock.Verify(x => x.ObserveAccount(It.IsAny<AccountInfo>(),
+                It.IsAny<double>()), Times.Never);
+            _cacheServiceMock.Verify(x => x.Set(It.IsAny<CacheType>(),
+                It.IsAny<string>(), It.IsAny<AccountInfo>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task SetupWebHookAndExportMetricsForUsersAsyncShouldSetWebHookUrlPropertyIfWebHookIsSuccessful()
         {
             // Arrange
             var webhookUrl = ValidWebHookUrl;
