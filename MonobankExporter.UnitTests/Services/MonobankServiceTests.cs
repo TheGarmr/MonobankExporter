@@ -21,7 +21,7 @@ namespace MonobankExporter.UnitTests.Services
     {
         private const string ValidWebHookUrl = "https://example.com/webhook";
         private readonly Mock<IMetricsExporterService> _metricsExporterMock;
-        private readonly Mock<ILookupsMemoryCache> _cacheServiceMock;
+        private readonly Mock<ILookupsMemoryCacheService> _cacheServiceMock;
         private readonly Mock<ILogger<MonobankService>> _loggerMock;
         private readonly Mock<IMonobankClient> _monobankClientMock;
 
@@ -30,7 +30,7 @@ namespace MonobankExporter.UnitTests.Services
         public MonobankServiceTests()
         {
             _metricsExporterMock = new Mock<IMetricsExporterService>();
-            _cacheServiceMock = new Mock<ILookupsMemoryCache>();
+            _cacheServiceMock = new Mock<ILookupsMemoryCacheService>();
             _loggerMock = new Mock<ILogger<MonobankService>>();
             _monobankClientMock = new Mock<IMonobankClient>();
         }

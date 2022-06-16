@@ -5,9 +5,9 @@ using MonobankExporter.Application.Interfaces;
 
 namespace MonobankExporter.Application.Services
 {
-    public class LookupsMemoryCache : MemoryCache, ILookupsMemoryCache
+    public class LookupsMemoryCacheService : MemoryCache, ILookupsMemoryCacheService
     {
-        public LookupsMemoryCache(IOptions<MemoryCacheOptions> options) : base(options) { }
+        public LookupsMemoryCacheService(IOptions<MemoryCacheOptions> options) : base(options) { }
 
         public bool TryGetValue<TItem>(CacheType cacheType, object key, out TItem value)
         {

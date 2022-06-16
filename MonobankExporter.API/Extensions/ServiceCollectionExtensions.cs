@@ -15,7 +15,7 @@ namespace MonobankExporter.API.Extensions
     {
         public static IServiceCollection AddCache(this IServiceCollection services)
         {
-            services.AddSingleton<ILookupsMemoryCache, LookupsMemoryCache>();
+            services.AddSingleton<ILookupsMemoryCacheService, LookupsMemoryCacheService>();
             return services;
         }
 

@@ -17,7 +17,7 @@ namespace MonobankExporter.Application.Services
     public class MonobankService : IMonobankService
     {
         private readonly IMonobankClient _monobankClient;
-        private readonly ILookupsMemoryCache _cacheService;
+        private readonly ILookupsMemoryCacheService _cacheService;
         private readonly IMetricsExporterService _metricsExporter;
         private readonly ILogger<MonobankService> _logger;
         private readonly MemoryCacheEntryOptions _cacheOptions;
@@ -25,7 +25,7 @@ namespace MonobankExporter.Application.Services
         public MonobankService(MonobankExporterOptions options,
             IMonobankClient monobankClient,
             IMetricsExporterService metricsExporterService,
-            ILookupsMemoryCache cacheService,
+            ILookupsMemoryCacheService cacheService,
             ILogger<MonobankService> logger)
         {
             _monobankClient = monobankClient;
