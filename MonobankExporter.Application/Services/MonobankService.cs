@@ -73,7 +73,7 @@ namespace MonobankExporter.Application.Services
                     }
                 }
 
-                ExportBalanceMetricsForUser(clientInfo, userInfo);
+                ExportBalanceMetricsForUser(userInfo);
             }
         }
 
@@ -99,7 +99,7 @@ namespace MonobankExporter.Application.Services
                     _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
                     userInfo.Name = clientInfo.Name;
                 }
-                ExportBalanceMetricsForUser(clientInfo, userInfo);
+                ExportBalanceMetricsForUser(userInfo);
             }
         }
 
@@ -161,7 +161,7 @@ namespace MonobankExporter.Application.Services
             }
         }
 
-        private void ExportBalanceMetricsForUser(ClientInfoOptions clientInfo, UserInfo userInfo)
+        private void ExportBalanceMetricsForUser(UserInfo userInfo)
         {
             try
             {
@@ -185,7 +185,7 @@ namespace MonobankExporter.Application.Services
             }
             catch
             {
-                _logger.LogError($"Observing of metrics for {clientInfo?.Name} unexpectedly failed.");
+                _logger.LogError($"Observing of metrics for {userInfo?.Name} unexpectedly failed.");
             }
         }
 
