@@ -105,3 +105,4 @@ monobank-api: #optional
            You can add an API url settings section if it will change.<br>
            Simply add the `monobank-api` section with the `ApiBaseUrl`  property. Currently, it uses the `https://api.monobank.ua` url by default.
   * v1.6.1 - Hotfix. Changed package version for client's NuGet package with webhook not setting.
+  * v1.6.2 - Changed log level for the Microsoft's http client to `Warning` for better logs readability

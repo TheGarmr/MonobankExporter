@@ -63,6 +63,7 @@ namespace MonobankExporter.API.Extensions
         {
             return new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
                 .MinimumLevel.Information()
                 .WriteTo.Console()
                 .WriteTo.File("/var/log/monobank-exporter.log")
