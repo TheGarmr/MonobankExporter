@@ -115,3 +115,4 @@ monobank-api: #optional
            Simply add the `monobank-api` section with the `ApiBaseUrl`  property. Currently, it uses the `https://api.monobank.ua` url by default.<br/>
            Deleted the `credit_limit` field from the `monobank_balance`. Instead of this `credit_limit` will be exposed as a separate metric.
   * v1.6.1 - Hotfix. Changed package version for client's NuGet package with webhook not setting.
+  * v1.6.2 - Changed log level for the Microsoft's http client to `Warning` for better logs readability
