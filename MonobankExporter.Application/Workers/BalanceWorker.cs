@@ -36,6 +36,11 @@ namespace MonobankExporter.Application.Workers
                 }
 
                 var validClients = await _monobankService.SetupWebHookAndExportMetricsForUsersAsync(_options.WebhookUrl, _options.Clients, stoppingToken);
+                if (!validClients.Any())
+                {
+                    _logger.LogWarning("There are no valid clients to expose metrics.");
+                    return;
+                }
                 Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
 
                 while (!stoppingToken.IsCancellationRequested)

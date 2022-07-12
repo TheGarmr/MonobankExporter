@@ -46,7 +46,7 @@ namespace MonobankExporter.Application.Services
                 _logger.LogWarning("List of clients is empty. Metrics could not be exported.");
                 return validClients;
             }
-            
+
             _logger.LogInformation($"Validating webhook url for all clients: {webHookUrl}.");
             var mainWebHookUrlIsValid = WebHookUrlIsValid(webHookUrl);
 
@@ -58,45 +58,53 @@ namespace MonobankExporter.Application.Services
                     continue;
                 }
 
-                var clientWebHookUrlIsValid = false;
-                var webHookSetUpResponseFromApi = false;
-                if (!string.IsNullOrWhiteSpace(clientInfo.WebHookUrl))
+                try
                 {
-                    _logger.LogInformation($"Client has its own webhook url. Let's try to use it. Url: {clientInfo.WebHookUrl}");
-                    clientWebHookUrlIsValid = WebHookUrlIsValid(clientInfo.WebHookUrl);
-                    if (clientWebHookUrlIsValid)
+
+                    var clientWebHookUrlIsValid = false;
+                    var webHookSetUpResponseFromApi = false;
+                    if (!string.IsNullOrWhiteSpace(clientInfo.WebHookUrl))
                     {
-                        webHookSetUpResponseFromApi = await _monobankClient.SetWebhookAsync(clientInfo.WebHookUrl, clientInfo.Token, stoppingToken);
+                        _logger.LogInformation($"Client has its own webhook url. Let's try to use it. Url: {clientInfo.WebHookUrl}");
+                        clientWebHookUrlIsValid = WebHookUrlIsValid(clientInfo.WebHookUrl);
+                        if (clientWebHookUrlIsValid)
+                        {
+                            webHookSetUpResponseFromApi = await _monobankClient.SetWebhookAsync(clientInfo.WebHookUrl, clientInfo.Token, stoppingToken);
+                        }
                     }
-                }
-                else if (mainWebHookUrlIsValid)
-                {
-                    webHookSetUpResponseFromApi = await _monobankClient.SetWebhookAsync(webHookUrl, clientInfo.Token, stoppingToken);
-                }
+                    else if (mainWebHookUrlIsValid)
+                    {
+                        webHookSetUpResponseFromApi = await _monobankClient.SetWebhookAsync(webHookUrl, clientInfo.Token, stoppingToken);
+                    }
 
-                var userInfo = await _monobankClient.GetClientInfoAsync(clientInfo.Token, stoppingToken);
-                if (userInfo == null)
-                {
-                    continue;
-                }
+                    var userInfo = await _monobankClient.GetClientInfoAsync(clientInfo.Token, stoppingToken);
+                    if (userInfo == null)
+                    {
+                        continue;
+                    }
 
-                if (!string.IsNullOrWhiteSpace(clientInfo.Name))
-                {
-                    _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}.");
-                    userInfo.Name = clientInfo.Name;
-                }
+                    if (!string.IsNullOrWhiteSpace(clientInfo.Name))
+                    {
+                        _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}.");
+                        userInfo.Name = clientInfo.Name;
+                    }
 
-                if (clientWebHookUrlIsValid || mainWebHookUrlIsValid)
-                {
-                    var webHookWasSet = webHookSetUpResponseFromApi && (webHookUrl.Equals(userInfo.WebHookUrl) || webHookUrl.Equals(clientInfo.WebHookUrl));
-                    var logMessage = webHookWasSet
-                        ? $"Webhook was correctly set for {userInfo.Name}."
-                        : $"Webhook was not set for {userInfo.Name}.";
-                    _logger.LogInformation(logMessage);
-                }
+                    if (clientWebHookUrlIsValid || mainWebHookUrlIsValid)
+                    {
+                        var webHookWasSet = webHookSetUpResponseFromApi && (webHookUrl.Equals(userInfo.WebHookUrl) || webHookUrl.Equals(clientInfo.WebHookUrl));
+                        var logMessage = webHookWasSet
+                            ? $"Webhook was correctly set for {userInfo.Name}."
+                            : $"Webhook was not set for {userInfo.Name}.";
+                        _logger.LogInformation(logMessage);
+                    }
 
-                ExportBalanceMetricsForUser(userInfo);
-                validClients.Add(clientInfo);
+                    ExportBalanceMetricsForUser(userInfo);
+                    validClients.Add(clientInfo);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError($"An error occurred during exposing metrics for {clientInfo?.Name}. Error message: {e.Message}");
+                }
             }
 
             return validClients;
