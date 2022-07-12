@@ -61,14 +61,10 @@ namespace MonobankExporter.API.Extensions
             return services;
         }
 
-        internal static ILogger AddLogger(this IServiceCollection services)
+        internal static ILogger AddLogger(this IServiceCollection services, IConfiguration configuration)
         {
             return new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
-                .MinimumLevel.Information()
-                .WriteTo.Console()
-                .WriteTo.File("/var/log/monobank-exporter.log")
+                .ReadFrom.Configuration(configuration)
                 .CreateLogger();
         }
     }

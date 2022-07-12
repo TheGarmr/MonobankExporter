@@ -12,6 +12,7 @@ namespace MonobankExporter.API.Extensions
                 var env = hostingContext.HostingEnvironment;
 
                 configBuilder
+                    .AddJsonFile("./appsettings.json")
                     .AddYamlFile("./monobank-exporter.yml", optional: true)
                     .AddYamlFile($"./monobank-exporter.{env.EnvironmentName}.yml", optional: true);
             });

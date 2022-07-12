@@ -17,8 +17,9 @@ namespace MonobankExporter.API
         
         public void ConfigureServices(IServiceCollection services)
         {
-            var logger = Serilog.Log.Logger = services.AddLogger();
-            logger.Information($"Running monobank-exporter v{GetType().Assembly.GetName().Version}");
+            var logger = Serilog.Log.Logger = services.AddLogger(Configuration);
+            var version = GetType().Assembly.GetName().Version;
+            logger.Information($"Running monobank-exporter v{version.Major}.{version.Minor}.{version.Build}");
             services.AddControllers();
             services.AddCache();
             services.AddMetricsExporters();
