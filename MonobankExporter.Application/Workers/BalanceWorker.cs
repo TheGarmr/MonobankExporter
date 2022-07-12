@@ -35,7 +35,7 @@ namespace MonobankExporter.Application.Workers
                     return;
                 }
 
-                await _monobankService.SetupWebHookAndExportMetricsForUsersAsync(_options.WebhookUrl, _options.Clients, stoppingToken);
+                var validClients = await _monobankService.SetupWebHookAndExportMetricsForUsersAsync(_options.WebhookUrl, _options.Clients, stoppingToken);
                 Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
 
                 while (!stoppingToken.IsCancellationRequested)
@@ -43,7 +43,7 @@ namespace MonobankExporter.Application.Workers
                     try
                     {
                         stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportBalanceMetricsForUsersAsync(_options.Clients, stoppingToken);
+                        await _monobankService.ExportBalanceMetricsForUsersAsync(validClients, stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {

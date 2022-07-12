@@ -38,15 +38,17 @@ namespace MonobankExporter.Application.Services
             };
         }
 
-        public async Task SetupWebHookAndExportMetricsForUsersAsync(string webHookUrl, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
+        public async Task<List<ClientInfoOptions>> SetupWebHookAndExportMetricsForUsersAsync(string webHookUrl, List<ClientInfoOptions> clients, CancellationToken stoppingToken)
         {
+            var validClients = new List<ClientInfoOptions>();
             if (clients == null || !clients.Any())
             {
                 _logger.LogWarning("List of clients is empty. Metrics could not be exported.");
-                return;
+                return validClients;
             }
-
-            var webHookUrlIsValid = WebHookUrlIsValid(webHookUrl);
+            
+            _logger.LogInformation($"Validating webhook url for all clients: {webHookUrl}.");
+            var mainWebHookUrlIsValid = WebHookUrlIsValid(webHookUrl);
 
             foreach (var clientInfo in clients)
             {
@@ -56,25 +58,48 @@ namespace MonobankExporter.Application.Services
                     continue;
                 }
 
+                var clientWebHookUrlIsValid = false;
+                var webHookSetUpResponseFromApi = false;
+                if (!string.IsNullOrWhiteSpace(clientInfo.WebHookUrl))
+                {
+                    _logger.LogInformation($"Client has its own webhook url. Let's try to use it. Url: {clientInfo.WebHookUrl}");
+                    clientWebHookUrlIsValid = WebHookUrlIsValid(clientInfo.WebHookUrl);
+                    if (clientWebHookUrlIsValid)
+                    {
+                        webHookSetUpResponseFromApi = await _monobankClient.SetWebhookAsync(clientInfo.WebHookUrl, clientInfo.Token, stoppingToken);
+                    }
+                }
+                else if (mainWebHookUrlIsValid)
+                {
+                    webHookSetUpResponseFromApi = await _monobankClient.SetWebhookAsync(webHookUrl, clientInfo.Token, stoppingToken);
+                }
+
                 var userInfo = await _monobankClient.GetClientInfoAsync(clientInfo.Token, stoppingToken);
+                if (userInfo == null)
+                {
+                    continue;
+                }
+
                 if (!string.IsNullOrWhiteSpace(clientInfo.Name))
                 {
-                    _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
+                    _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}.");
                     userInfo.Name = clientInfo.Name;
                 }
 
-                if (webHookUrlIsValid)
-                { 
-                    var webhookWasSet = await _monobankClient.SetWebhookAsync(webHookUrl, clientInfo.Token, stoppingToken);
-                    if (webhookWasSet)
-                    {
-                        _logger.LogInformation($"The webhook url for {userInfo.Name} was set successfully");
-                        userInfo.WebHookUrl = webHookUrl;
-                    }
+                if (clientWebHookUrlIsValid || mainWebHookUrlIsValid)
+                {
+                    var webHookWasSet = webHookSetUpResponseFromApi && (webHookUrl.Equals(userInfo.WebHookUrl) || webHookUrl.Equals(clientInfo.WebHookUrl));
+                    var logMessage = webHookWasSet
+                        ? $"Webhook was correctly set for {userInfo.Name}."
+                        : $"Webhook was not set for {userInfo.Name}.";
+                    _logger.LogInformation(logMessage);
                 }
 
                 ExportBalanceMetricsForUser(userInfo);
+                validClients.Add(clientInfo);
             }
+
+            return validClients;
         }
 
         public async Task ExportBalanceMetricsForUsersAsync(List<ClientInfoOptions> clients, CancellationToken stoppingToken)
@@ -127,11 +152,11 @@ namespace MonobankExporter.Application.Services
                         _metricsExporter.ObserveCurrency(currency.CurrencyNameA, currency.CurrencyNameB, CurrencyObserveType.Cross, currency.RateCross);
                     }
                 }
-                _logger.LogInformation("Observed currencies metrics...");
+                _logger.LogInformation("Exposed currencies metrics...");
             }
             catch
             {
-                _logger.LogError("Observing of currencies metrics unexpectedly failed.");
+                _logger.LogError("Exposing of currencies metrics unexpectedly failed.");
             }
         }
 
@@ -153,11 +178,11 @@ namespace MonobankExporter.Application.Services
                 }
 
                 _metricsExporter.ObserveAccountBalance(accountInfo, webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit);
-                _logger.LogInformation($"Observed metrics by webhook for {accountInfo.HolderName}...");
+                _logger.LogInformation($"Exposed metrics by webhook for {accountInfo.HolderName}...");
             }
             catch
             {
-                _logger.LogError("Observing of currencies from webhook unexpectedly failed.");
+                _logger.LogError("Exposing of currencies from webhook unexpectedly failed.");
             }
         }
 
@@ -181,11 +206,11 @@ namespace MonobankExporter.Application.Services
                         _cacheService.Set(CacheType.AccountInfo, account.Id, accountInfo, _cacheOptions);
                     }
                 }
-                _logger.LogInformation($"Observed metrics for {userInfo.Name}");
+                _logger.LogInformation($"Exposed metrics for {userInfo.Name}");
             }
             catch
             {
-                _logger.LogError($"Observing of metrics for {userInfo?.Name} unexpectedly failed.");
+                _logger.LogError($"Exposing of metrics for {userInfo?.Name} unexpectedly failed.");
             }
         }
 
@@ -196,8 +221,6 @@ namespace MonobankExporter.Application.Services
                 _logger.LogWarning("The webhook url is empty.");
                 return false;
             }
-
-            _logger.LogInformation($"Validating webhook url from configs: {webHookUrl}.");
 
             var isUrl = Uri.TryCreate(webHookUrl, UriKind.Absolute, out var uriResult);
             if (!isUrl)
@@ -212,7 +235,7 @@ namespace MonobankExporter.Application.Services
                 return false;
             }
 
-            if (!uriResult.AbsoluteUri.Contains("."))
+            if (!uriResult.AbsoluteUri.Contains('.'))
             {
                 _logger.LogWarning("The webhook url does not dot in the address. It seems like it's not a domain.");
                 return false;
