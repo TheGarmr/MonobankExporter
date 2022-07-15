@@ -22,7 +22,7 @@ namespace MonobankExporter.API
             logger.Information($"Running monobank-exporter v{version.Major}.{version.Minor}.{version.Build}");
             services.AddControllers();
             services.AddCache();
-            services.AddMetricsExporters();
+            services.AddMetricsOptions(Configuration);
             services.AddMonobankExporterOptions(Configuration);
             services.AddMonobankService();
             services.AddMonobankClient(Configuration);

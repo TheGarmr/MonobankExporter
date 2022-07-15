@@ -18,13 +18,6 @@
   * setup you Prometheus instance to scrape metrics
   * run `docker-compose up -d`
 
-### monobank-exporter usage
-  * minimal request time for client info is 2 minutes
-  * minimal request time for currencies info is 10 minutes
-  * use HTTP or HTTPS for webhook only
-  * `/webhook` ending is mandatory
-  * basic auth is not required. it can be added from the config
-
 ### Metrics
 | Metric name               | Description                             |
 | ------------------------- | --------------------------------------- |
@@ -33,6 +26,24 @@
 | monobank_currencies_buy   | Shows currencies rate for buy           |
 | monobank_currencies_sell  | Shows currencies rate for sell          |
 | monobank_currencies_cross | Shows currencies rate for cross         |
+
+Metrics names can be overridden in the `metrics` config section. You can provide any name for these metrics.
+Here is the example with names as default.
+```yaml
+metrics:
+  balance: "monobank_balance"
+  creditLimit: "monobank_credit_limit"
+  currenciesBuy: "monobank_currencies_buy"
+  currenciesSell: "monobank_currencies_sell"
+  currenciesCross: "monobank_currencies_cross"
+```
+
+### monobank-exporter usage
+  * minimal request time for client info is 2 minutes
+  * minimal request time for currencies info is 10 minutes
+  * use HTTP or HTTPS for webhook only
+  * `/webhook` ending is mandatory
+  * basic auth is not required. it can be added from the config
 
 Currencies metrics will be provisioned in any case.<br/>
 The client's metrics will be provisioned only in the case of the existing token.<br/>
