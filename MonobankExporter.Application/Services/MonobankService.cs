@@ -60,7 +60,6 @@ namespace MonobankExporter.Application.Services
 
                 try
                 {
-
                     var clientWebHookUrlIsValid = false;
                     var webHookSetUpResponseFromApi = false;
                     if (!string.IsNullOrWhiteSpace(clientInfo.WebHookUrl))
