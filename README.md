@@ -129,3 +129,5 @@ monobank-api: #optional
            Deleted the `credit_limit` field from the `monobank_balance`. Instead of this `credit_limit` will be exposed as a separate metric.
   * v1.6.1 - Hotfix. Changed package version for client's NuGet package with webhook not setting.
   * v1.6.2 - Changed log level for the Microsoft's http client to `Warning` for better logs readability
+  * v1.7 - Migrated the app to .Net 6. Refactored a lot and small redisign on balance exporting.
+           Added ability to override metrics names.
