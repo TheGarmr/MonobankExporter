@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using MonobankExporter.BusinessLogic.Enums;
-using MonobankExporter.BusinessLogic.Interfaces;
+using MonobankExporter.Application.Enums;
+using MonobankExporter.Application.Interfaces;
 
-namespace MonobankExporter.BusinessLogic.Services
+namespace MonobankExporter.Application.Services
 {
-    public class LookupsMemoryCache : MemoryCache, ILookupsMemoryCache
+    public class LookupsMemoryCacheService : MemoryCache, ILookupsMemoryCacheService
     {
-        public LookupsMemoryCache(IOptions<MemoryCacheOptions> options) : base(options) { }
+        public LookupsMemoryCacheService(IOptions<MemoryCacheOptions> options) : base(options) { }
 
         public bool TryGetValue<TItem>(CacheType cacheType, object key, out TItem value)
         {

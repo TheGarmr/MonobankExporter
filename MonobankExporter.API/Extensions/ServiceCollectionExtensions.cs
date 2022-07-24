@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Monobank.Client;
-using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Services;
-using MonobankExporter.BusinessLogic.Workers;
 using Monobank.Client.Extensions;
-using MonobankExporter.BusinessLogic.Options;
+using MonobankExporter.Application.Interfaces;
+using MonobankExporter.Application.Options;
+using MonobankExporter.Application.Services;
+using MonobankExporter.Application.Workers;
 using Serilog;
 using Serilog.Events;
 
@@ -15,12 +15,14 @@ namespace MonobankExporter.API.Extensions
     {
         public static IServiceCollection AddCache(this IServiceCollection services)
         {
-            services.AddSingleton<ILookupsMemoryCache, LookupsMemoryCache>();
+            services.AddSingleton<ILookupsMemoryCacheService, LookupsMemoryCacheService>();
             return services;
         }
 
-        internal static IServiceCollection AddMetricsExporters(this IServiceCollection services)
+        internal static IServiceCollection AddMetricsOptions(this IServiceCollection services, IConfiguration configuration)
         {
+            var options = configuration.GetSection("metrics").Get<MetricsOptions>() ?? new MetricsOptions();
+            services.AddSingleton(options);
             services.AddSingleton<IMetricsExporterService, PrometheusExporterService>();
             return services;
         }
@@ -59,14 +61,10 @@ namespace MonobankExporter.API.Extensions
             return services;
         }
 
-        internal static ILogger AddLogger(this IServiceCollection services)
+        internal static ILogger AddLogger(this IServiceCollection services, IConfiguration configuration)
         {
             return new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
-                .MinimumLevel.Information()
-                .WriteTo.Console()
-                .WriteTo.File("/var/log/monobank-exporter.log")
+                .ReadFrom.Configuration(configuration)
                 .CreateLogger();
         }
     }

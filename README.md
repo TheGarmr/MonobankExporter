@@ -18,6 +18,26 @@
   * setup you Prometheus instance to scrape metrics
   * run `docker-compose up -d`
 
+### Metrics
+| Metric name               | Description                             |
+| ------------------------- | --------------------------------------- |
+| monobank_balance          | Show current balance for each card      |
+| monobank_credit_limit     | Show current credit limit for each card |
+| monobank_currencies_buy   | Shows currencies rate for buy           |
+| monobank_currencies_sell  | Shows currencies rate for sell          |
+| monobank_currencies_cross | Shows currencies rate for cross         |
+
+Metrics names can be overridden in the `metrics` config section. You can provide any name for these metrics.
+Here is the example with names as default.
+```yaml
+metrics:
+  balance: "monobank_balance"
+  creditLimit: "monobank_credit_limit"
+  currenciesBuy: "monobank_currencies_buy"
+  currenciesSell: "monobank_currencies_sell"
+  currenciesCross: "monobank_currencies_cross"
+```
+
 ### monobank-exporter usage
   * minimal request time for client info is 2 minutes
   * minimal request time for currencies info is 10 minutes
@@ -32,6 +52,8 @@ Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<
 # Logs
   * logs are shown at the console and written to file `/var/log/monobank-exporter.log`
   * currently image is not able to create the log file by himself. you need to create a log file by yourself. if anyone knows how to fix this - I will be open to communication
+  * Serilog is used as a logger. Settings are defined in the `/etc/monobank-exporter/appsettings.json` file.
+    You  can override this settings. Documentation can be found here: [Serilog.Settings.Configuration](https://github.com/serilog/serilog-settings-configuration)
 
 # Examples<br/>
 
@@ -103,6 +125,9 @@ monobank-api: #optional
   * v1.5.1 - Hotfix of webhook publishing
   * v1.6 - Refactored project. Added small features. Added newly created package for HTTP client.<br/>
            You can add an API url settings section if it will change.<br>
-           Simply add the `monobank-api` section with the `ApiBaseUrl`  property. Currently, it uses the `https://api.monobank.ua` url by default.
+           Simply add the `monobank-api` section with the `ApiBaseUrl`  property. Currently, it uses the `https://api.monobank.ua` url by default.<br/>
+           Deleted the `credit_limit` field from the `monobank_balance`. Instead of this `credit_limit` will be exposed as a separate metric.
   * v1.6.1 - Hotfix. Changed package version for client's NuGet package with webhook not setting.
   * v1.6.2 - Changed log level for the Microsoft's http client to `Warning` for better logs readability
+  * v1.7 - Migrated the app to .Net 6. Refactored a lot and small redisign on balance exporting.
+           Added ability to override metrics names. Added ability to override Serilog's settings.

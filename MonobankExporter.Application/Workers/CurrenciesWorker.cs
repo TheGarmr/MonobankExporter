@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Options;
+using MonobankExporter.Application.Interfaces;
+using MonobankExporter.Application.Options;
 
-namespace MonobankExporter.BusinessLogic.Workers
+namespace MonobankExporter.Application.Workers
 {
     public class CurrenciesWorker : BackgroundService
     {

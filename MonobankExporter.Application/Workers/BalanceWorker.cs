@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MonobankExporter.BusinessLogic.Interfaces;
-using MonobankExporter.BusinessLogic.Options;
+using MonobankExporter.Application.Interfaces;
+using MonobankExporter.Application.Options;
 
-namespace MonobankExporter.BusinessLogic.Workers
+namespace MonobankExporter.Application.Workers
 {
     public class BalanceWorker : BackgroundService
     {
@@ -35,13 +35,20 @@ namespace MonobankExporter.BusinessLogic.Workers
                     return;
                 }
 
-                var webHookWasSet = await SetupWebHook(stoppingToken);
+                var validClients = await _monobankService.SetupWebHookAndExportMetricsForUsersAsync(_options.WebhookUrl, _options.Clients, stoppingToken);
+                if (!validClients.Any())
+                {
+                    _logger.LogWarning("There are no valid clients to expose metrics.");
+                    return;
+                }
+                Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
+
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     try
                     {
                         stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportMetricsForUsersAsync(webHookWasSet, _options.Clients, stoppingToken);
+                        await _monobankService.ExportBalanceMetricsForUsersAsync(validClients, stoppingToken);
                     }
                     catch (OperationCanceledException)
                     {
@@ -55,18 +62,6 @@ namespace MonobankExporter.BusinessLogic.Workers
                     Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
                 }
             }, stoppingToken);
-        }
-
-        private async Task<bool> SetupWebHook(CancellationToken cancellationToken)
-        {
-            var webhookWillBeUsed = _monobankService.WebHookUrlIsValid(_options.WebhookUrl);
-            if (webhookWillBeUsed)
-            {
-                _logger.LogInformation("Webhook url is valid. Trying to setup it.");
-                await _monobankService.SetupWebHookForUsersAsync(_options.WebhookUrl, _options.Clients, cancellationToken);
-            }
-
-            return webhookWillBeUsed;
         }
     }
 }
