@@ -1,8 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS publish
 
-LABEL version="v1.7"
-LABEL maintainer=TheGarmr
-LABEL url=https://github.com/TheGarmr/monobank-exporter
+ARG VERSION
+ARG MAINTAINER
+ARG URL
+
+LABEL version=$VERSION
+LABEL maintainer=$MAINTAINER
+LABEL url=$URL
 
 WORKDIR /etc/monobank-exporter
 
@@ -28,10 +32,8 @@ FROM mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine AS final
 RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime && apk upgrade musl
 
 RUN adduser --disabled-password \
-  --home /app \
-  --gecos '' monobankuser && chown -R monobankuser /app
-
-RUN touch /var/log/monobank-exporter.log && chown -R monobankuser:monobankuser /var/log/monobank-exporter.log
+  --home /etc/monobank-exporter \
+  --gecos '' monobankuser && chown -R monobankuser /etc/monobank-exporter
 
 USER monobankuser
 

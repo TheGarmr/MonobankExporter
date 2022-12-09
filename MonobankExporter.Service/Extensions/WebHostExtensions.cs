@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
-namespace MonobankExporter.API.Extensions
+namespace MonobankExporter.Service.Extensions
 {
     internal static class WebHostExtensions
     {

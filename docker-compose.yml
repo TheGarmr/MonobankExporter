@@ -6,7 +6,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: MonobankExporter.API/Dockerfile
+      dockerfile: MonobankExporter.Service/Dockerfile
     ports:
       - "27000:80"
     volumes:
