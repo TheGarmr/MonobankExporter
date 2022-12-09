@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using MonobankExporter.Application.Options;
 
-namespace MonobankExporter.API.Middleware
+namespace MonobankExporter.Service.Middleware
 {
     public class BasicAuthMiddleware
     {

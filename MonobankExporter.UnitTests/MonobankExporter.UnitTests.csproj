@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MonobankExporter.API\MonobankExporter.API.csproj" />
+    <ProjectReference Include="..\MonobankExporter.Service\MonobankExporter.Service.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,9 +7,8 @@ using MonobankExporter.Application.Options;
 using MonobankExporter.Application.Services;
 using MonobankExporter.Application.Workers;
 using Serilog;
-using Serilog.Events;
 
-namespace MonobankExporter.API.Extensions
+namespace MonobankExporter.Service.Extensions
 {
     internal static class ServiceCollectionExtensions
     {

@@ -2,10 +2,10 @@ using System;
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using MonobankExporter.API.Extensions;
+using MonobankExporter.Service.Extensions;
 using Serilog;
 
-namespace MonobankExporter.API
+namespace MonobankExporter.Service
 {
     public class Program
     {

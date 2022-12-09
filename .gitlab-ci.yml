@@ -1,0 +1,50 @@
+variables:
+  DOCKER_VERSION_MAJOR: "1"
+  DOCKER_VERSION_MINOR: "8"
+  DOCKER_IMAGE: mcr.microsoft.com/dotnet/sdk:6.0-alpine
+  DOCKER_IMAGE_NAME: monobank-exporter
+  PROJECT_NAME: "MonobankExporter.Service"
+  PROJECT_REPOSITORY: "https://github.com/TheGarmr/monobank-exporter"
+
+stages:
+  - build
+  - unit-tests
+  - deploy
+
+Build:
+  stage: build
+  image: $DOCKER_IMAGE
+  script:
+    - echo "Building $PROJECT_NAME..."
+    - dotnet build
+
+Unit tests:
+  stage: unit-tests
+  image: $DOCKER_IMAGE
+  script:
+    - dotnet test ./$PROJECT_NAME.UnitTests/$PROJECT_NAME.UnitTests.csproj
+
+Deploy:
+  stage: deploy
+  image: docker:20-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+      when: manual
+    - if: $CI_COMMIT_BRANCH
+      when: never
+  services:
+    - name: docker:20-dind
+      alias: docker
+      command: ["--tls=false"]
+  script:
+    - echo "Logging into Docker Hub..."
+    - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+    - echo "Building image with version v$DOCKER_VERSION_MAJOR.$DOCKER_VERSION_MINOR"
+    - docker build --build-arg VERSION=$DOCKER_VERSION_MAJOR.$DOCKER_VERSION_MINOR.0 --build-arg MAINTAINER=$DOCKER_HUB_USERNAME --build-arg URL=$PROJECT_REPOSITORY -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:v$DOCKER_VERSION_MAJOR.$DOCKER_VERSION_MINOR -f ./$PROJECT_NAME/Dockerfile .
+    - docker tag $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:v$DOCKER_VERSION_MAJOR.$DOCKER_VERSION_MINOR $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
+    - docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:v$DOCKER_VERSION_MAJOR.$DOCKER_VERSION_MINOR
+    - docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
