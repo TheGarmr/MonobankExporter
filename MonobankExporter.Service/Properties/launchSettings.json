@@ -1,7 +1,7 @@
 {
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "MonobankExporter.API": {
+    "MonobankExporter.Service": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "metrics",

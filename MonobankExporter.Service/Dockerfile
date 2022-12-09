@@ -11,12 +11,12 @@ LABEL url=$URL
 WORKDIR /etc/monobank-exporter
 
 COPY ["MonobankExporter.Application/MonobankExporter.Application.csproj", "MonobankExporter.Application/"]
-COPY ["MonobankExporter.API/MonobankExporter.API.csproj", "MonobankExporter.API/"]
+COPY ["MonobankExporter.Service/MonobankExporter.Service.csproj", "MonobankExporter.Service/"]
 
-RUN dotnet restore "MonobankExporter.API/MonobankExporter.API.csproj" --runtime alpine-x64
+RUN dotnet restore "MonobankExporter.Service/MonobankExporter.Service.csproj" --runtime alpine-x64
 COPY . .
 
-RUN dotnet publish "MonobankExporter.API/MonobankExporter.API.csproj" \
+RUN dotnet publish "MonobankExporter.Service/MonobankExporter.Service.csproj" \
     --configuration Release \
     --output /etc/monobank-exporter/publish \
     --no-restore \
@@ -40,4 +40,4 @@ USER monobankuser
 WORKDIR /etc/monobank-exporter
 EXPOSE 80
 COPY --from=publish /etc/monobank-exporter/publish .
-ENTRYPOINT ["./MonobankExporter.API"]
+ENTRYPOINT ["./MonobankExporter.Service"]
