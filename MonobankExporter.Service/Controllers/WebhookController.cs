@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Monobank.Client.Models;
 using MonobankExporter.Application.Interfaces;
 
-namespace MonobankExporter.API.Controllers
+namespace MonobankExporter.Service.Controllers
 {
     [ApiController]
     [Route("webhook")]

@@ -51,7 +51,6 @@ Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<
 
 # Logs
   * logs are shown at the console and written to file `/var/log/monobank-exporter.log`
-  * currently image is not able to create the log file by himself. you need to create a log file by yourself. if anyone knows how to fix this - I will be open to communication
   * Serilog is used as a logger. Settings are defined in the `/etc/monobank-exporter/appsettings.json` file.
     You  can override this settings. Documentation can be found here: [Serilog.Settings.Configuration](https://github.com/serilog/serilog-settings-configuration)
 
@@ -131,3 +130,6 @@ monobank-api: #optional
   * v1.6.2 - Changed log level for the Microsoft's http client to `Warning` for better logs readability
   * v1.7 - Migrated the app to .Net 6. Refactored a lot and small redisign on balance exporting.
            Added ability to override metrics names. Added ability to override Serilog's settings.
+  * v1.8 - Resolved issue with logs.
+           Renamed project 'API' to 'Service'.
+           Added .gitlab-ci.yml

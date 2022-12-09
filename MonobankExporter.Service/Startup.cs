@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MonobankExporter.API.Extensions;
+using MonobankExporter.Service.Extensions;
 using Prometheus;
 
-namespace MonobankExporter.API
+namespace MonobankExporter.Service
 {
     public class Startup
     {

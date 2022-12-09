@@ -362,5 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-MonobankExporter.API/monobank-exporter.yml
-MonobankExporter.API/monobank-exporter.*.yml
+MonobankExporter.Service/monobank-exporter.yml
+MonobankExporter.Service/monobank-exporter.*.yml

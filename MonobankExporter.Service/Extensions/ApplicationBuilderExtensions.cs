@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using MonobankExporter.API.Middleware;
+using MonobankExporter.Service.Middleware;
 
-namespace MonobankExporter.API.Extensions
+namespace MonobankExporter.Service.Extensions
 {
     internal static class ApplicationBuilderExtensions
     {
