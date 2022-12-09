@@ -9,7 +9,7 @@ variables:
 stages:
   - build
   - unit-tests
-  - deploy
+  - publish
 
 Build:
   stage: build
@@ -24,15 +24,15 @@ Unit tests:
   script:
     - dotnet test ./$PROJECT_NAME.UnitTests/$PROJECT_NAME.UnitTests.csproj
 
-Deploy:
-  stage: deploy
+Publish docker image:
+  stage: publish
   image: docker:20-dind
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "main"
       when: manual
     - if: $CI_COMMIT_BRANCH
       when: never
