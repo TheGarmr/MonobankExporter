@@ -136,4 +136,6 @@ monobank-api: #optional
            Added ability to override Serilog's settings.
   * v1.8 - Resolved issue with logs.<br/>
            Renamed project 'API' to 'Service'.<br/>
-           Added .gitlab-ci.yml<br/>
+           Added .gitlab-ci.yml
+  * v1.9 - Disabled non-root user at container to fix issue with logs on Unix systems
+
