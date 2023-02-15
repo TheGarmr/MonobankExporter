@@ -11,3 +11,4 @@ services:
       - "27000:80"
     volumes:
       - ./monobank-exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
+      - ./logs:/etc/monobank-exporter/logs
