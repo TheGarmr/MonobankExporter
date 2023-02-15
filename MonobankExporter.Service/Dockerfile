@@ -31,11 +31,11 @@ FROM mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine AS final
 
 RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime && apk upgrade musl
 
-RUN adduser --disabled-password \
-  --home /etc/monobank-exporter \
-  --gecos '' monobankuser && chown -R monobankuser /etc/monobank-exporter
-
-USER monobankuser
+#RUN adduser --disabled-password \
+  #--home /etc/monobank-exporter \
+  #--gecos '' monobankuser && chown -R monobankuser /etc/monobank-exporter
+#
+#USER monobankuser
 
 WORKDIR /etc/monobank-exporter
 EXPOSE 80
