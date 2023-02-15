@@ -8,60 +8,59 @@ using Microsoft.Extensions.Logging;
 using MonobankExporter.Application.Interfaces;
 using MonobankExporter.Application.Options;
 
-namespace MonobankExporter.Application.Workers
+namespace MonobankExporter.Application.Workers;
+
+public class BalanceWorker : BackgroundService
 {
-    public class BalanceWorker : BackgroundService
+    private readonly MonobankExporterOptions _options;
+    private readonly IMonobankService _monobankService;
+    private readonly ILogger<BalanceWorker> _logger;
+
+    public BalanceWorker(MonobankExporterOptions options,
+        IServiceScopeFactory scopeFactory)
     {
-        private readonly MonobankExporterOptions _options;
-        private readonly IMonobankService _monobankService;
-        private readonly ILogger<BalanceWorker> _logger;
+        _options = options;
+        var scope = scopeFactory.CreateScope();
+        _logger = scope.ServiceProvider.GetRequiredService<ILogger<BalanceWorker>>();
+        _monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
+    }
 
-        public BalanceWorker(MonobankExporterOptions options,
-            IServiceScopeFactory scopeFactory)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        return Task.Run(async () =>
         {
-            _options = options;
-            var scope = scopeFactory.CreateScope();
-            _logger = scope.ServiceProvider.GetRequiredService<ILogger<BalanceWorker>>();
-            _monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
-        }
-
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            return Task.Run(async () =>
+            if (!_options.Clients.Any())
             {
-                if (!_options.Clients.Any())
+                _logger.LogWarning("List of clients is empty. Metrics could not be exported.");
+                return;
+            }
+
+            var validClients = await _monobankService.SetupWebHookAndExportMetricsForUsersAsync(_options.WebhookUrl, _options.Clients, stoppingToken);
+            if (!validClients.Any())
+            {
+                _logger.LogWarning("There are no valid clients to expose metrics.");
+                return;
+            }
+            Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
+
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                try
                 {
-                    _logger.LogWarning("List of clients is empty. Metrics could not be exported.");
-                    return;
+                    stoppingToken.ThrowIfCancellationRequested();
+                    await _monobankService.ExportBalanceMetricsForUsersAsync(validClients, stoppingToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("Stopping balance metrics export");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Balance export unexpectedly failed. Error message: {ex.Message}");
                 }
 
-                var validClients = await _monobankService.SetupWebHookAndExportMetricsForUsersAsync(_options.WebhookUrl, _options.Clients, stoppingToken);
-                if (!validClients.Any())
-                {
-                    _logger.LogWarning("There are no valid clients to expose metrics.");
-                    return;
-                }
                 Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
-
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    try
-                    {
-                        stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportBalanceMetricsForUsersAsync(validClients, stoppingToken);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        _logger.LogInformation("Stopping balance metrics export");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Balance export unexpectedly failed. Error message: {ex.Message}");
-                    }
-
-                    Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));
-                }
-            }, stoppingToken);
-        }
+            }
+        }, stoppingToken);
     }
 }

@@ -7,46 +7,45 @@ using Microsoft.Extensions.Logging;
 using MonobankExporter.Application.Interfaces;
 using MonobankExporter.Application.Options;
 
-namespace MonobankExporter.Application.Workers
+namespace MonobankExporter.Application.Workers;
+
+public class CurrenciesWorker : BackgroundService
 {
-    public class CurrenciesWorker : BackgroundService
+    private readonly MonobankExporterOptions _options;
+    private readonly IMonobankService _monobankService;
+    private readonly ILogger<CurrenciesWorker> _logger;
+
+    public CurrenciesWorker(MonobankExporterOptions options,
+        IServiceScopeFactory scopeFactory)
     {
-        private readonly MonobankExporterOptions _options;
-        private readonly IMonobankService _monobankService;
-        private readonly ILogger<CurrenciesWorker> _logger;
+        _options = options;
+        var scope = scopeFactory.CreateScope();
+        _logger = scope.ServiceProvider.GetRequiredService<ILogger<CurrenciesWorker>>();
+        _monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
+    }
 
-        public CurrenciesWorker(MonobankExporterOptions options,
-            IServiceScopeFactory scopeFactory)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        return Task.Run(async () =>
         {
-            _options = options;
-            var scope = scopeFactory.CreateScope();
-            _logger = scope.ServiceProvider.GetRequiredService<ILogger<CurrenciesWorker>>();
-            _monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
-        }
-
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            return Task.Run(async () =>
+            while (!stoppingToken.IsCancellationRequested)
             {
-                while (!stoppingToken.IsCancellationRequested)
+                try
                 {
-                    try
-                    {
-                        stoppingToken.ThrowIfCancellationRequested();
-                        await _monobankService.ExportMetricsForCurrenciesAsync(stoppingToken);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        _logger.LogInformation("Stopping currencies metrics export");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Currencies export unexpectedly failed. Error message: {ex.Message}");
-                    }
-
-                    Thread.Sleep(TimeSpan.FromMinutes(_options.CurrenciesRefreshTimeInMinutes));
+                    stoppingToken.ThrowIfCancellationRequested();
+                    await _monobankService.ExportMetricsForCurrenciesAsync(stoppingToken);
                 }
-            }, stoppingToken);
-        }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("Stopping currencies metrics export");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Currencies export unexpectedly failed. Error message: {ex.Message}");
+                }
+
+                Thread.Sleep(TimeSpan.FromMinutes(_options.CurrenciesRefreshTimeInMinutes));
+            }
+        }, stoppingToken);
     }
 }

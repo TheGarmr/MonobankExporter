@@ -1,9 +1,8 @@
-﻿namespace MonobankExporter.Application.Enums
+﻿namespace MonobankExporter.Application.Enums;
+
+public enum CurrencyObserveType
 {
-    public enum CurrencyObserveType
-    {
-        Buy,
-        Sell,
-        Cross
-    }
+    Buy,
+    Sell,
+    Cross
 }
