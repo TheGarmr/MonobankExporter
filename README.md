@@ -50,9 +50,10 @@ The client's metrics will be provisioned only in the case of the existing token.
 Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<br/>
 
 # Logs
-  * logs are shown at the console and written to file `/var/log/monobank-exporter.log`
+  * logs are shown at the console and written to file `/etc/monobank-exporter/logs/monobank-exporter.log`
   * Serilog is used as a logger. Settings are defined in the `/etc/monobank-exporter/appsettings.json` file.
-    You  can override this settings. Documentation can be found here: [Serilog.Settings.Configuration](https://github.com/serilog/serilog-settings-configuration)
+    You  can override this settings.<br/>
+	Documentation can be found here: [Serilog.Settings.Configuration](https://github.com/serilog/serilog-settings-configuration)
 
 # Examples<br/>
 
@@ -67,6 +68,7 @@ services:
     restart: always
     volumes:
       - ./monobank-exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
+	  - ./logs:/etc/monobank-exporter/logs
 ```
 
 ## Docker-compose with the image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter) with Grafana and Prometheus

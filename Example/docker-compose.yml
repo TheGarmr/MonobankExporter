@@ -44,6 +44,7 @@ services:
       - monitoring
     volumes:
       - ./configs/exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
+      - ./logs:/etc/monobank-exporter/logs
 
 networks:
   monitoring:
