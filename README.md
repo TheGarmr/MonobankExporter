@@ -68,7 +68,7 @@ services:
     restart: always
     volumes:
       - ./monobank-exporter.yml:/etc/monobank-exporter/monobank-exporter.yml
-	  - ./logs:/etc/monobank-exporter/logs
+      - ./logs:/etc/monobank-exporter/logs
 ```
 
 ## Docker-compose with the image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter) with Grafana and Prometheus
@@ -127,11 +127,13 @@ monobank-api: #optional
   * v1.6 - Refactored project. Added small features. Added newly created package for HTTP client.<br/>
            You can add an API url settings section if it will change.<br>
            Simply add the `monobank-api` section with the `ApiBaseUrl`  property. Currently, it uses the `https://api.monobank.ua` url by default.<br/>
-           Deleted the `credit_limit` field from the `monobank_balance`. Instead of this `credit_limit` will be exposed as a separate metric.
+           Deleted the `credit_limit` field from the `monobank_balance`.<br/>
+           Instead of this `credit_limit` will be exposed as a separate metric.
   * v1.6.1 - Hotfix. Changed package version for client's NuGet package with webhook not setting.
   * v1.6.2 - Changed log level for the Microsoft's http client to `Warning` for better logs readability
-  * v1.7 - Migrated the app to .Net 6. Refactored a lot and small redisign on balance exporting.
-           Added ability to override metrics names. Added ability to override Serilog's settings.
-  * v1.8 - Resolved issue with logs.
-           Renamed project 'API' to 'Service'.
-           Added .gitlab-ci.yml
+  * v1.7 - Migrated the app to .Net 6. Refactored a lot and small redisign on balance exporting.<br/>
+           Added ability to override metrics names.<br/>
+           Added ability to override Serilog's settings.
+  * v1.8 - Resolved issue with logs.<br/>
+           Renamed project 'API' to 'Service'.<br/>
+           Added .gitlab-ci.yml<br/>
