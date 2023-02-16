@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using MonobankExporter.Service.Middleware;
 
-namespace MonobankExporter.Service.Extensions
+namespace MonobankExporter.Service.Extensions;
+
+internal static class ApplicationBuilderExtensions
 {
-    internal static class ApplicationBuilderExtensions
+    internal static IApplicationBuilder UseBasicAuth(this IApplicationBuilder builder)
     {
-        internal static IApplicationBuilder UseBasicAuth(this IApplicationBuilder builder)
-        {
-            builder.UseMiddleware<BasicAuthMiddleware>();
-            return builder;
-        }
+        builder.UseMiddleware<BasicAuthMiddleware>();
+        return builder;
     }
 }

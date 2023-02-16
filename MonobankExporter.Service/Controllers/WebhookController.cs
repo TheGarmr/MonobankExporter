@@ -3,30 +3,29 @@ using Microsoft.AspNetCore.Mvc;
 using Monobank.Client.Models;
 using MonobankExporter.Application.Interfaces;
 
-namespace MonobankExporter.Service.Controllers
+namespace MonobankExporter.Service.Controllers;
+
+[ApiController]
+[Route("webhook")]
+public class WebhookController : ControllerBase
 {
-    [ApiController]
-    [Route("webhook")]
-    public class WebhookController : ControllerBase
+    private readonly IMonobankService _monobankService;
+
+    public WebhookController(IMonobankService webHookService)
     {
-        private readonly IMonobankService _monobankService;
+        _monobankService = webHookService;
+    }
 
-        public WebhookController(IMonobankService webHookService)
-        {
-            _monobankService = webHookService;
-        }
+    [HttpGet]
+    public IActionResult Webhook()
+    {
+        return Ok();
+    }
 
-        [HttpGet]
-        public IActionResult Webhook()
-        {
-            return Ok();
-        }
-
-        [HttpPost]
-        public ActionResult Webhook([FromBody] WebHook webhook, CancellationToken stoppingToken)
-        {
-            _monobankService.ExportMetricsOnWebHook(webhook, stoppingToken);
-            return Ok();
-        }
+    [HttpPost]
+    public ActionResult Webhook([FromBody] WebHook webhook, CancellationToken stoppingToken)
+    {
+        _monobankService.ExportMetricsOnWebHook(webhook, stoppingToken);
+        return Ok();
     }
 }

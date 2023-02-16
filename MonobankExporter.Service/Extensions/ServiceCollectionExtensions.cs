@@ -8,63 +8,62 @@ using MonobankExporter.Application.Services;
 using MonobankExporter.Application.Workers;
 using Serilog;
 
-namespace MonobankExporter.Service.Extensions
+namespace MonobankExporter.Service.Extensions;
+
+internal static class ServiceCollectionExtensions
 {
-    internal static class ServiceCollectionExtensions
+    public static IServiceCollection AddCache(this IServiceCollection services)
     {
-        public static IServiceCollection AddCache(this IServiceCollection services)
-        {
-            services.AddSingleton<ILookupsMemoryCacheService, LookupsMemoryCacheService>();
-            return services;
-        }
+        services.AddSingleton<ILookupsMemoryCacheService, LookupsMemoryCacheService>();
+        return services;
+    }
 
-        internal static IServiceCollection AddMetricsOptions(this IServiceCollection services, IConfiguration configuration)
-        {
-            var options = configuration.GetSection("metrics").Get<MetricsOptions>() ?? new MetricsOptions();
-            services.AddSingleton(options);
-            services.AddSingleton<IMetricsExporterService, PrometheusExporterService>();
-            return services;
-        }
+    internal static IServiceCollection AddMetricsOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        var options = configuration.GetSection("metrics").Get<MetricsOptions>() ?? new MetricsOptions();
+        services.AddSingleton(options);
+        services.AddSingleton<IMetricsExporterService, PrometheusExporterService>();
+        return services;
+    }
 
-        internal static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
-        {
-            services.AddHostedService<BalanceWorker>();
-            services.AddHostedService<CurrenciesWorker>();
-            return services;
-        }
+    internal static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
+    {
+        services.AddHostedService<UserInfoExportWorker>();
+        services.AddHostedService<CurrenciesWorker>();
+        return services;
+    }
 
-        internal static IServiceCollection AddMonobankService(this IServiceCollection services)
-        {
-            services.AddScoped<IMonobankService, MonobankService>();
-            return services;
-        }
+    internal static IServiceCollection AddMonobankService(this IServiceCollection services)
+    {
+        services.AddScoped<IMonobankService, MonobankService>();
+        return services;
+    }
 
-        internal static IServiceCollection AddMonobankExporterOptions(this IServiceCollection services, IConfiguration configuration)
-        {
-            var options = configuration.GetSection("monobank-exporter").Get<MonobankExporterOptions>() ?? new MonobankExporterOptions();
-            services.AddSingleton(options);
-            return services;
-        }
+    internal static IServiceCollection AddMonobankExporterOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        var options = configuration.GetSection("monobank-exporter").Get<MonobankExporterOptions>() ?? new MonobankExporterOptions();
+        services.AddSingleton(options);
+        return services;
+    }
 
-        internal static IServiceCollection AddBasicAuthOptions(this IServiceCollection services, IConfiguration configuration)
-        {
-            var options = configuration.GetSection("basic-auth").Get<BasicAuthOptions>() ?? new BasicAuthOptions();
-            services.AddSingleton(options);
-            return services;
-        }
+    internal static IServiceCollection AddBasicAuthOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        var options = configuration.GetSection("basic-auth").Get<BasicAuthOptions>() ?? new BasicAuthOptions();
+        services.AddSingleton(options);
+        return services;
+    }
 
-        internal static IServiceCollection AddMonobankClient(this IServiceCollection services, IConfiguration configuration)
-        {
-            var options = configuration.GetSection("monobank-api").Get<MonobankClientOptions>() ?? new MonobankClientOptions();
-            services.AddMonobankClient(options);
-            return services;
-        }
+    internal static IServiceCollection AddMonobankClient(this IServiceCollection services, IConfiguration configuration)
+    {
+        var options = configuration.GetSection("monobank-api").Get<MonobankClientOptions>() ?? new MonobankClientOptions();
+        services.AddMonobankClient(options);
+        return services;
+    }
 
-        internal static ILogger AddLogger(this IServiceCollection services, IConfiguration configuration)
-        {
-            return new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .CreateLogger();
-        }
+    internal static ILogger AddLogger(this IServiceCollection services, IConfiguration configuration)
+    {
+        return new LoggerConfiguration()
+            .ReadFrom.Configuration(configuration)
+            .CreateLogger();
     }
 }

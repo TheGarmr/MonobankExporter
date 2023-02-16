@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using MonobankExporter.Application.Enums;
 
-namespace MonobankExporter.Application.Interfaces
+namespace MonobankExporter.Application.Interfaces;
+
+public interface ILookupsMemoryCacheService : IMemoryCache
 {
-    public interface ILookupsMemoryCacheService : IMemoryCache
-    {
-        bool TryGetValue<TItem>(CacheType cacheType, object key, out TItem value);
-        TItem Set<TItem>(CacheType cacheType, object key, TItem value, MemoryCacheEntryOptions options);
-    }
+    bool TryGetValue<TItem>(CacheType cacheType, object key, out TItem value);
+    TItem Set<TItem>(CacheType cacheType, object key, TItem value, MemoryCacheEntryOptions options);
 }
