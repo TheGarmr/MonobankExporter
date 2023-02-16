@@ -4,48 +4,47 @@ using Microsoft.Extensions.DependencyInjection;
 using MonobankExporter.Service.Extensions;
 using Prometheus;
 
-namespace MonobankExporter.Service
+namespace MonobankExporter.Service;
+
+public class Startup
 {
-    public class Startup
+    public Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        Configuration = configuration;
+    }
 
-        public IConfiguration Configuration { get; }
+    public IConfiguration Configuration { get; }
         
-        public void ConfigureServices(IServiceCollection services)
-        {
-            var logger = Serilog.Log.Logger = services.AddLogger(Configuration);
-            var version = GetType().Assembly.GetName().Version;
-            logger.Information($"Running monobank-exporter v{version.Major}.{version.Minor}.{version.Build}");
-            services.AddControllers();
-            services.AddCache();
-            services.AddMetricsOptions(Configuration);
-            services.AddMonobankExporterOptions(Configuration);
-            services.AddMonobankService();
-            services.AddMonobankClient(Configuration);
-            services.AddBackgroundWorkers();
-            services.AddBasicAuthOptions(Configuration);
-        }
+    public void ConfigureServices(IServiceCollection services)
+    {
+        var logger = Serilog.Log.Logger = services.AddLogger(Configuration);
+        var version = GetType().Assembly.GetName().Version;
+        logger.Information($"Running monobank-exporter v{version.Major}.{version.Minor}.{version.Build}");
+        services.AddControllers();
+        services.AddCache();
+        services.AddMetricsOptions(Configuration);
+        services.AddMonobankExporterOptions(Configuration);
+        services.AddMonobankService();
+        services.AddMonobankClient(Configuration);
+        services.AddBackgroundWorkers();
+        services.AddBasicAuthOptions(Configuration);
+    }
         
-        public void Configure(IApplicationBuilder app)
+    public void Configure(IApplicationBuilder app)
+    {
+        app.UseRouting();
+
+        app.Map("/metrics", metricsEndpoint =>
         {
-            app.UseRouting();
+            metricsEndpoint.UseBasicAuth();
+            metricsEndpoint.UseMetricServer("");
+        });
 
-            app.Map("/metrics", metricsEndpoint =>
-            {
-                metricsEndpoint.UseBasicAuth();
-                metricsEndpoint.UseMetricServer("");
-            });
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-
-            Metrics.SuppressDefaultMetrics();
-        }
+        Metrics.SuppressDefaultMetrics();
     }
 }

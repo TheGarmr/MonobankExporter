@@ -1,7 +1,7 @@
-﻿namespace MonobankExporter.Application.Enums
+﻿namespace MonobankExporter.Application.Enums;
+
+public enum CacheType
 {
-    public enum CacheType
-    {
-        AccountInfo
-    }
+    AccountInfo,
+    JarInfo
 }
