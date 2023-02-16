@@ -1,4 +1,5 @@
-﻿using MonobankExporter.Application.Enums;
+﻿using System.Globalization;
+using MonobankExporter.Application.Enums;
 using MonobankExporter.Application.Interfaces;
 using MonobankExporter.Application.Models;
 using MonobankExporter.Application.Options;
@@ -10,6 +11,7 @@ public class PrometheusExporterService : IMetricsExporterService
 {
     private readonly MetricsOptions _options;
     private Gauge _balanceGauge;
+    private Gauge _jarsGauge;
     private Gauge _creditLimitGauge;
     private Gauge _currenciesBuyGauge;
     private Gauge _currenciesSellGauge;
@@ -21,10 +23,21 @@ public class PrometheusExporterService : IMetricsExporterService
         SetupMetrics();
     }
 
-    public void ObserveAccountBalance(AccountInfo account, double balance)
+    public void ObserveAccountBalance(AccountInfo account)
     {
-        _balanceGauge.Labels(account.HolderName, account.CurrencyType, account.CardType).Set(balance);
-        _creditLimitGauge.Labels(account.HolderName, account.CurrencyType, account.CardType).Set(account.CreditLimit);
+        _balanceGauge
+            .Labels(account.HolderName, account.CurrencyType, account.CardType)
+            .Set(account.Balance);
+        _creditLimitGauge
+            .Labels(account.HolderName, account.CurrencyType, account.CardType)
+            .Set(account.CreditLimit);
+    }
+
+    public void ObserveJarInfo(JarInfo jar)
+    {
+        _jarsGauge
+            .Labels(jar.HolderName, jar.Title, jar.Description, jar.CurrencyType, jar.Goal.ToString(CultureInfo.InvariantCulture))
+            .Set(jar.Balance);
     }
 
     public void ObserveCurrency(string currencyNameA, string currencyNameB, CurrencyObserveType type, float value)
@@ -48,6 +61,10 @@ public class PrometheusExporterService : IMetricsExporterService
         _balanceGauge = Metrics.CreateGauge(_options.Balance, "shows current balance", new GaugeConfiguration
         {
             LabelNames = new[] { "name", "currency_type", "card_type" }
+        });
+        _jarsGauge = Metrics.CreateGauge(_options.Jars, "shows current jars", new GaugeConfiguration
+        {
+            LabelNames = new[] { "name", "title", "description", "currency_type", "goal" }
         });
         _creditLimitGauge = Metrics.CreateGauge(_options.CreditLimit, "shows current credit limit", new GaugeConfiguration
         {

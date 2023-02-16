@@ -2,5 +2,6 @@
 
 public enum CacheType
 {
-    AccountInfo
+    AccountInfo,
+    JarInfo
 }

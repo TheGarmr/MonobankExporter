@@ -21,7 +21,7 @@ public class LookupsMemoryCacheService : MemoryCache, ILookupsMemoryCacheService
 
     private static string CreateKey<T>(CacheType cacheType, T key)
     {
-        return (object.Equals(key, default(T)))
+        return Equals(key, default(T))
             ? $"{cacheType}"
             : $"{cacheType}:{key}";
     }

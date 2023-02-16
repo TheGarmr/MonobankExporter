@@ -22,6 +22,7 @@
 | Metric name               | Description                             |
 | ------------------------- | --------------------------------------- |
 | monobank_balance          | Show current balance for each card      |
+| monobank_jars             | Show current list of jars               |
 | monobank_credit_limit     | Show current credit limit for each card |
 | monobank_currencies_buy   | Shows currencies rate for buy           |
 | monobank_currencies_sell  | Shows currencies rate for sell          |
@@ -32,6 +33,7 @@ Here is the example with names as default.
 ```yaml
 metrics:
   balance: "monobank_balance"
+  jars: "monobank_jars"
   creditLimit: "monobank_credit_limit"
   currenciesBuy: "monobank_currencies_buy"
   currenciesSell: "monobank_currencies_sell"
@@ -138,4 +140,5 @@ monobank-api: #optional
            Renamed project 'API' to 'Service'.<br/>
            Added .gitlab-ci.yml
   * v1.9 - Disabled non-root user at container to fix issue with logs on Unix systems
+  * v1.10 - Added export of actual jars
 
