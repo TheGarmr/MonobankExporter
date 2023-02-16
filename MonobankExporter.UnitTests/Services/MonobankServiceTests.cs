@@ -90,7 +90,7 @@ public class MonobankServiceTests
         service.ExportMetricsOnWebHook(null, CancellationToken.None);
 
         // Assert
-        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>()), Times.Never);
         _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
     }
 
@@ -108,7 +108,7 @@ public class MonobankServiceTests
         service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
         // Assert
-        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>()), Times.Never);
         _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
     }
 
@@ -126,7 +126,7 @@ public class MonobankServiceTests
         service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
         // Assert
-        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>()), Times.Never);
         _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out _tryGetResult), Times.Never);
     }
 
@@ -144,7 +144,7 @@ public class MonobankServiceTests
         service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
         // Assert
-        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>()), Times.Never);
         AccountInfo result;
         _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, It.IsAny<object>(), out result), Times.Never);
     }
@@ -169,7 +169,7 @@ public class MonobankServiceTests
         service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
         // Assert
-        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()), Times.Never);
+        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>()), Times.Never);
         _cacheServiceMock.Verify(x => x.TryGetValue(CacheType.AccountInfo, account, out _tryGetResult), Times.Once);
     }
 
@@ -197,7 +197,8 @@ public class MonobankServiceTests
         service.ExportMetricsOnWebHook(webhook, CancellationToken.None);
 
         // Assert
-        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), expectedBalance), Times.Once);
+        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.Is<AccountInfo>(
+            a => a.Balance == expectedBalance)), Times.Once);
     }
 
     #endregion
@@ -275,8 +276,8 @@ public class MonobankServiceTests
         _monobankClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
             .ReturnsAsync(clientFromApi);
         AccountInfo expectedAccount = null;
-        _metricsExporterMock.Setup(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()))
-            .Callback((AccountInfo account, double balance) => expectedAccount = account);
+        _metricsExporterMock.Setup(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>()))
+            .Callback((AccountInfo account) => expectedAccount = account);
         var service = GetService();
 
         // Act
@@ -303,8 +304,7 @@ public class MonobankServiceTests
         // Assert
         _monobankClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(),
             It.IsAny<CancellationToken>()), Times.Never);
-        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(),
-            It.IsAny<double>()), Times.Never);
+        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>()), Times.Never);
         _cacheServiceMock.Verify(x => x.Set(It.IsAny<CacheType>(),
             It.IsAny<string>(), It.IsAny<AccountInfo>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Never);
     }
@@ -410,8 +410,7 @@ public class MonobankServiceTests
         // Assert
         _monobankClientMock.Verify(x => x.GetClientInfoAsync(It.IsAny<string>(),
             It.IsAny<CancellationToken>()), Times.Never);
-        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(),
-            It.IsAny<double>()), Times.Never);
+        _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>()), Times.Never);
         _cacheServiceMock.Verify(x => x.Set(It.IsAny<CacheType>(),
             It.IsAny<string>(), It.IsAny<AccountInfo>(), It.IsAny<MemoryCacheEntryOptions>()), Times.Never);
     }
@@ -438,8 +437,8 @@ public class MonobankServiceTests
             It.IsAny<CancellationToken>()), Times.Once);
         foreach (var account in client.Accounts)
         {
-            _metricsExporterMock.Verify(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(),
-                account.BalanceWithoutCreditLimit), Times.Once);
+            _metricsExporterMock.Verify(x => 
+                x.ObserveAccountBalance(It.Is<AccountInfo>(x => x.Balance == account.BalanceWithoutCreditLimit)), Times.Once);
         }
     }
 
@@ -505,8 +504,8 @@ public class MonobankServiceTests
         _monobankClientMock.Setup(x => x.GetClientInfoAsync(token, It.IsAny<CancellationToken>()))
             .ReturnsAsync(clientFromApi);
         AccountInfo expectedAccount = null;
-        _metricsExporterMock.Setup(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>(), It.IsAny<double>()))
-            .Callback((AccountInfo account, double balance) => expectedAccount = account);
+        _metricsExporterMock.Setup(x => x.ObserveAccountBalance(It.IsAny<AccountInfo>()))
+            .Callback((AccountInfo account) => expectedAccount = account);
         var service = GetService();
 
         // Act

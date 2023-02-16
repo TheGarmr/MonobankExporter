@@ -6,4 +6,5 @@ public class AccountInfo
     public string CurrencyType { get; set; }
     public string CardType { get; set; }
     public double CreditLimit { get; set; }
+    public double Balance { get; set; }
 }

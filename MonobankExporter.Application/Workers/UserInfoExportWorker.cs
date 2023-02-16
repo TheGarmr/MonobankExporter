@@ -10,18 +10,18 @@ using MonobankExporter.Application.Options;
 
 namespace MonobankExporter.Application.Workers;
 
-public class BalanceWorker : BackgroundService
+public class UserInfoExportWorker : BackgroundService
 {
     private readonly MonobankExporterOptions _options;
     private readonly IMonobankService _monobankService;
-    private readonly ILogger<BalanceWorker> _logger;
+    private readonly ILogger<UserInfoExportWorker> _logger;
 
-    public BalanceWorker(MonobankExporterOptions options,
+    public UserInfoExportWorker(MonobankExporterOptions options,
         IServiceScopeFactory scopeFactory)
     {
         _options = options;
         var scope = scopeFactory.CreateScope();
-        _logger = scope.ServiceProvider.GetRequiredService<ILogger<BalanceWorker>>();
+        _logger = scope.ServiceProvider.GetRequiredService<ILogger<UserInfoExportWorker>>();
         _monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
     }
 
@@ -52,11 +52,11 @@ public class BalanceWorker : BackgroundService
                 }
                 catch (OperationCanceledException)
                 {
-                    _logger.LogInformation("Stopping balance metrics export");
+                    _logger.LogInformation($"Stopping {nameof(UserInfoExportWorker)}");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Balance export unexpectedly failed. Error message: {ex.Message}");
+                    _logger.LogError($"{nameof(UserInfoExportWorker)} unexpectedly failed. Error message: {ex.Message}");
                 }
 
                 Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));

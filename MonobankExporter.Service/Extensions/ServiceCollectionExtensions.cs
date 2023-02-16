@@ -28,7 +28,7 @@ internal static class ServiceCollectionExtensions
 
     internal static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
     {
-        services.AddHostedService<BalanceWorker>();
+        services.AddHostedService<UserInfoExportWorker>();
         services.AddHostedService<CurrenciesWorker>();
         return services;
     }

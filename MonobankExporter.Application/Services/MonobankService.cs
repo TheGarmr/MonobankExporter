@@ -98,6 +98,7 @@ public class MonobankService : IMonobankService
                 }
 
                 ExportBalanceMetricsForUser(userInfo);
+                ExportJarsMetricsForUser(userInfo);
                 validClients.Add(clientInfo);
             }
             catch (Exception e)
@@ -177,19 +178,30 @@ public class MonobankService : IMonobankService
                 _logger.LogInformation($"The webHook has invalid data. Metrics won't be exposed. Card: {webhook?.Data?.Account}...");
                 return;
             }
-
-            if (!_cacheService.TryGetValue(CacheType.AccountInfo, webhook.Data.Account, out AccountInfo accountInfo))
+            
+            if (_cacheService.TryGetValue(CacheType.AccountInfo, webhook.Data.Account, out AccountInfo accountInfo))
             {
-                _logger.LogWarning($"The cache doesn't contain a record with account info. Metrics won't be exposed. Card: {webhook.Data.Account}...");
+                accountInfo.Balance = webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit;
+                _metricsExporter.ObserveAccountBalance(accountInfo);
+                _cacheService.Set(CacheType.AccountInfo, webhook.Data.Account, accountInfo, _cacheOptions);
+                _logger.LogInformation($"Exposed metrics for account from webhook for {accountInfo.HolderName}...");
                 return;
             }
 
-            _metricsExporter.ObserveAccountBalance(accountInfo, webhook.Data.StatementItem.BalanceAsMoney - accountInfo.CreditLimit);
-            _logger.LogInformation($"Exposed metrics by webhook for {accountInfo.HolderName}...");
+            if (_cacheService.TryGetValue(CacheType.JarInfo, webhook.Data.Account, out JarInfo jarInfo))
+            {
+                jarInfo.Balance = webhook.Data.StatementItem.BalanceAsMoney;
+                _metricsExporter.ObserveJarInfo(jarInfo);
+                _cacheService.Set(CacheType.JarInfo, webhook.Data.Account, jarInfo, _cacheOptions);
+                _logger.LogInformation($"Exposed metrics for jar from webhook for {jarInfo.HolderName}...");
+                return;
+            }
+
+            _logger.LogWarning($"The cache doesn't contain a record with account info or jar info. Metrics won't be exposed. Id: {webhook.Data.Account}...");
         }
         catch
         {
-            _logger.LogError("Exposing of currencies from webhook unexpectedly failed.");
+            _logger.LogError("Exposing of info from webhook unexpectedly failed.");
         }
     }
 
@@ -204,20 +216,53 @@ public class MonobankService : IMonobankService
                     HolderName = userInfo.Name,
                     CurrencyType = account.CurrencyName,
                     CardType = account.Type.ToString(),
-                    CreditLimit = account.CreditLimitAsMoney
+                    CreditLimit = account.CreditLimitAsMoney,
+                    Balance = account.BalanceWithoutCreditLimit
                 };
 
-                _metricsExporter.ObserveAccountBalance(accountInfo, account.BalanceWithoutCreditLimit);
+                _metricsExporter.ObserveAccountBalance(accountInfo);
                 if (!string.IsNullOrWhiteSpace(userInfo.WebHookUrl))
                 {
                     _cacheService.Set(CacheType.AccountInfo, account.Id, accountInfo, _cacheOptions);
                 }
             }
-            _logger.LogInformation($"Exposed metrics for {userInfo.Name}");
+
+            _logger.LogInformation($"Exposed balance metrics for {userInfo.Name}");
         }
         catch
         {
-            _logger.LogError($"Exposing of metrics for {userInfo?.Name} unexpectedly failed.");
+            _logger.LogError($"Exposing of balance metrics for {userInfo?.Name} unexpectedly failed.");
+        }
+    }
+
+    private void ExportJarsMetricsForUser(UserInfo userInfo)
+    {
+        try
+        {
+            foreach (var jar in userInfo.Jars)
+            {
+                var jarInfo = new JarInfo
+                {
+                    HolderName = userInfo.Name,
+                    CurrencyType = jar.CurrencyName,
+                    Balance = jar.BalanceAsMoney,
+                    Description = jar.Description,
+                    Goal = jar.GoalAsMoney,
+                    Title = jar.Title
+                };
+
+                _metricsExporter.ObserveJarInfo(jarInfo);
+                if (!string.IsNullOrWhiteSpace(userInfo.WebHookUrl))
+                {
+                    _cacheService.Set(CacheType.JarInfo, jar.Id, jarInfo, _cacheOptions);
+                }
+            }
+
+            _logger.LogInformation($"Exposed jar metrics for {userInfo.Name}");
+        }
+        catch
+        {
+            _logger.LogError($"Exposing of jar metrics for {userInfo?.Name} unexpectedly failed.");
         }
     }
 
