@@ -1,4 +1,7 @@
-# Monobank Exporter [<img src="https://img.shields.io/badge/Docker%20Hub-images-blue.svg?logo=Docker">](https://hub.docker.com/r/thegarmr/monobank-exporter)
+# Monobank Exporter [<img src="https://img.shields.io/badge/Docker%20Hub-images-blue.svg?logo=Docker">](https://hub.docker.com/r/thegarmr/monobank-exporter)<br>
+[<img src="https://img.shields.io/docker/pulls/thegarmr/monobank-exporter?label=Docker%20pulls&style=for-the-badge">](https://hub.docker.com/r/thegarmr/monobank-exporter)
+[<img src="https://img.shields.io/docker/v/thegarmr/monobank-exporter?label=Latest%20Docker%20version&style=for-the-badge">](https://www.nuget.org/packages/MonobankClient/)<br>
+
 ### This application exports _Prometheus_ metrics for [Monobank](https://www.monobank.ua).
 ### Full API documentation can be found here: [Monobank open API](https://api.monobank.ua/docs/)
 
