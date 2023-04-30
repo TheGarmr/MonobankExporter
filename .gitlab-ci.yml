@@ -1,7 +1,7 @@
 variables:
   DOCKER_VERSION_MAJOR: "1"
-  DOCKER_VERSION_MINOR: "10"
-  DOCKER_IMAGE: mcr.microsoft.com/dotnet/sdk:6.0-alpine
+  DOCKER_VERSION_MINOR: "11"
+  DOCKER_IMAGE: mcr.microsoft.com/dotnet/sdk:7.0-alpine
   DOCKER_IMAGE_NAME: monobank-exporter
   PROJECT_NAME: "MonobankExporter"
   PROJECT_REPOSITORY: "https://github.com/TheGarmr/monobank-exporter"
