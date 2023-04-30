@@ -13,6 +13,7 @@ using MonobankExporter.Application.Interfaces;
 Console.OutputEncoding = Encoding.UTF8;
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
+builder.WebHost.ConfigureAppConfigurations();
 var version = builder.LogStartMessageWithVersion(Log.Logger);
 Log.Logger = builder.AddLogger(builder.Configuration);
 builder.Services.AddControllers();
