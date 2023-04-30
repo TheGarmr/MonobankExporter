@@ -144,4 +144,4 @@ monobank-api: #optional
            Added .gitlab-ci.yml
   * v1.9 - Disabled non-root user at container to fix issue with logs on Unix systems
   * v1.10 - Added export of actual jars
-
+  * v1.11 - Upgraded .Net version to 7.0. Added minimal API.

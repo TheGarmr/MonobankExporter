@@ -59,11 +59,4 @@ internal static class ServiceCollectionExtensions
         services.AddMonobankClient(options);
         return services;
     }
-
-    internal static ILogger AddLogger(this IServiceCollection services, IConfiguration configuration)
-    {
-        return new LoggerConfiguration()
-            .ReadFrom.Configuration(configuration)
-            .CreateLogger();
-    }
 }
