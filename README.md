@@ -8,7 +8,7 @@
 ### Functionality
   * Publish currencies metrics
   * Publish a client's balance and credit limit for each card as metrics
-  * You can use your name different from that stored in the bank
+  * You can use your name differently from that stored in the bank
   * basic auth to the metrics endpoint
 
 ### API limitations:
@@ -16,17 +16,17 @@
   * Information about currencies refreshes once per 5 minutes
 
 ### Quickstart:
-  * create a docker-compose file
+  * Create a docker-compose file
   * fill in a config file
-  * setup you Prometheus instance to scrape metrics
+  * setup your Prometheus instance to scrape metrics
   * run `docker-compose up -d`
 
 ### Metrics
 | Metric name               | Description                             |
 | ------------------------- | --------------------------------------- |
-| monobank_balance          | Show current balance for each card      |
+| monobank_balance          | Show the current balance for each card      |
 | monobank_jars             | Show current list of jars               |
-| monobank_credit_limit     | Show current credit limit for each card |
+| monobank_credit_limit     | Show the current credit limit for each card |
 | monobank_currencies_buy   | Shows currencies rate for buy           |
 | monobank_currencies_sell  | Shows currencies rate for sell          |
 | monobank_currencies_cross | Shows currencies rate for cross         |
@@ -50,19 +50,19 @@ metrics:
   * `/webhook` ending is mandatory
   * basic auth is not required. it can be added from the config
 
-Currencies metrics will be provisioned in any case.<br/>
+Currency metrics will be provisioned in any case.<br/>
 The client's metrics will be provisioned only in the case of the existing token.<br/>
 Webhook will be set only in case of a valid URL (HTTP or HTTPS doesn't matter).<br/>
 
 # Logs
   * logs are shown at the console and written to file `/etc/monobank-exporter/logs/monobank-exporter.log`
   * Serilog is used as a logger. Settings are defined in the `/etc/monobank-exporter/appsettings.json` file.
-    You  can override this settings.<br/>
+    You can override these settings.<br/>
 	Documentation can be found here: [Serilog.Settings.Configuration](https://github.com/serilog/serilog-settings-configuration)
 
 # Examples<br/>
 
-## Docker-compose with image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter)
+## Docker-compose with the image from [Docker Hub](https://hub.docker.com/r/thegarmr/monobank-exporter)
 ```yaml
 version: '3.1'
 
@@ -81,7 +81,7 @@ You can find this example in the `Example` folder<br/>
 Clone the repository to your local folder<br/>
 `git clone https://github.com/TheGarmr/monobank-exporter.git`<br/>
 
-Go to folder with sources<br/>
+Go to the folder with sources<br/>
 `cd monobank-exporter/Example`<br/>
 
 Edit monobank-exporter.yml in the root folder (you can find an example below)<br/>
@@ -93,7 +93,7 @@ Compose up!<br/>
 Clone the repository to your local folder<br/>
 `git clone https://github.com/TheGarmr/monobank-exporter.git`<br/>
 
-Go to folder with sources<br/>
+Go to the folder with sources<br/>
 `cd monobank-exporter`<br/>
 
 Edit monobank-exporter.yml in the root folder (you can find an example below)<br/>
