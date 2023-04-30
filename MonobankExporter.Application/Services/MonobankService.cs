@@ -237,6 +237,12 @@ public class MonobankService : IMonobankService
 
     private void ExportJarsMetricsForUser(UserInfo userInfo)
     {
+        if (userInfo.Jars == null || !userInfo.Jars.Any())
+        {
+            _logger.LogInformation($"{userInfo.Name} doesn't have any jars. Skipping...");
+            return;
+        }
+
         try
         {
             foreach (var jar in userInfo.Jars)
