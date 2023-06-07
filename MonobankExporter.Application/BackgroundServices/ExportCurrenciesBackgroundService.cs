@@ -7,20 +7,20 @@ using Microsoft.Extensions.Logging;
 using MonobankExporter.Application.Interfaces;
 using MonobankExporter.Application.Options;
 
-namespace MonobankExporter.Application.Workers;
+namespace MonobankExporter.Application.BackgroundServices;
 
-public class CurrenciesWorker : BackgroundService
+public class ExportCurrenciesBackgroundService : BackgroundService
 {
     private readonly MonobankExporterOptions _options;
     private readonly IMonobankService _monobankService;
-    private readonly ILogger<CurrenciesWorker> _logger;
+    private readonly ILogger<ExportCurrenciesBackgroundService> _logger;
 
-    public CurrenciesWorker(MonobankExporterOptions options,
+    public ExportCurrenciesBackgroundService(MonobankExporterOptions options,
         IServiceScopeFactory scopeFactory)
     {
         _options = options;
         var scope = scopeFactory.CreateScope();
-        _logger = scope.ServiceProvider.GetRequiredService<ILogger<CurrenciesWorker>>();
+        _logger = scope.ServiceProvider.GetRequiredService<ILogger<ExportCurrenciesBackgroundService>>();
         _monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
     }
 

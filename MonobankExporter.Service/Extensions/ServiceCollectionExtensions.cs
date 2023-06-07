@@ -2,11 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Monobank.Client;
 using Monobank.Client.Extensions;
+using MonobankExporter.Application.BackgroundServices;
 using MonobankExporter.Application.Interfaces;
 using MonobankExporter.Application.Options;
 using MonobankExporter.Application.Services;
-using MonobankExporter.Application.Workers;
-using Serilog;
 
 namespace MonobankExporter.Service.Extensions;
 
@@ -26,10 +25,10 @@ internal static class ServiceCollectionExtensions
         return services;
     }
 
-    internal static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
+    internal static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
-        services.AddHostedService<UserInfoExportWorker>();
-        services.AddHostedService<CurrenciesWorker>();
+        services.AddHostedService<ExportUserInfoBackgroundService>();
+        services.AddHostedService<ExportCurrenciesBackgroundService>();
         return services;
     }
 

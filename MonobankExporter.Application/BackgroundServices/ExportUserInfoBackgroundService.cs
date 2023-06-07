@@ -8,20 +8,20 @@ using Microsoft.Extensions.Logging;
 using MonobankExporter.Application.Interfaces;
 using MonobankExporter.Application.Options;
 
-namespace MonobankExporter.Application.Workers;
+namespace MonobankExporter.Application.BackgroundServices;
 
-public class UserInfoExportWorker : BackgroundService
+public class ExportUserInfoBackgroundService : BackgroundService
 {
     private readonly MonobankExporterOptions _options;
     private readonly IMonobankService _monobankService;
-    private readonly ILogger<UserInfoExportWorker> _logger;
+    private readonly ILogger<ExportUserInfoBackgroundService> _logger;
 
-    public UserInfoExportWorker(MonobankExporterOptions options,
+    public ExportUserInfoBackgroundService(MonobankExporterOptions options,
         IServiceScopeFactory scopeFactory)
     {
         _options = options;
         var scope = scopeFactory.CreateScope();
-        _logger = scope.ServiceProvider.GetRequiredService<ILogger<UserInfoExportWorker>>();
+        _logger = scope.ServiceProvider.GetRequiredService<ILogger<ExportUserInfoBackgroundService>>();
         _monobankService = scope.ServiceProvider.GetRequiredService<IMonobankService>();
     }
 
@@ -52,11 +52,11 @@ public class UserInfoExportWorker : BackgroundService
                 }
                 catch (OperationCanceledException)
                 {
-                    _logger.LogInformation($"Stopping {nameof(UserInfoExportWorker)}");
+                    _logger.LogInformation($"Stopping {nameof(ExportUserInfoBackgroundService)}");
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"{nameof(UserInfoExportWorker)} unexpectedly failed. Error message: {ex.Message}");
+                    _logger.LogError($"{nameof(ExportUserInfoBackgroundService)} unexpectedly failed. ErrorType: {typeof(Exception)}. Error message: {ex.Message}");
                 }
 
                 Thread.Sleep(TimeSpan.FromMinutes(_options.ClientsRefreshTimeInMinutes));

@@ -22,7 +22,7 @@ builder.Services.AddMetricsOptions(builder.Configuration);
 builder.Services.AddMonobankExporterOptions(builder.Configuration);
 builder.Services.AddMonobankService();
 builder.Services.AddMonobankClient(builder.Configuration);
-builder.Services.AddBackgroundWorkers();
+builder.Services.AddBackgroundServices();
 builder.Services.AddBasicAuthOptions(builder.Configuration);
 
 var app = builder.Build();
