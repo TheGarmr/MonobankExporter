@@ -31,11 +31,9 @@ Publish docker image:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
-  rules:
-    - if: $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "main"
-      when: manual
-    - if: $CI_COMMIT_BRANCH
-      when: never
+  only:
+    - main
+  when: manual
   services:
     - name: docker:20-dind
       alias: docker
