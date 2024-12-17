@@ -36,7 +36,7 @@ public class PrometheusExporterService : IMetricsExporterService
     public void ObserveJarInfo(JarInfo jar)
     {
         _jarsGauge
-            .Labels(jar.HolderName, jar.Title, jar.Description, jar.CurrencyType, jar.Goal.ToString(CultureInfo.InvariantCulture))
+            .Labels(jar.HolderName, jar.Title, jar.Description, jar.CurrencyType, jar.Goal?.ToString(CultureInfo.InvariantCulture) ?? string.Empty)
             .Set(jar.Balance);
     }
 

@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS publish
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS publish
 
 ARG VERSION
 ARG MAINTAINER
@@ -13,7 +13,7 @@ WORKDIR /etc/monobank-exporter
 COPY ["MonobankExporter.Application/MonobankExporter.Application.csproj", "MonobankExporter.Application/"]
 COPY ["MonobankExporter.Service/MonobankExporter.Service.csproj", "MonobankExporter.Service/"]
 
-RUN dotnet restore "MonobankExporter.Service/MonobankExporter.Service.csproj" --runtime alpine-x64
+RUN dotnet restore "MonobankExporter.Service/MonobankExporter.Service.csproj" --runtime linux-musl-x64
 COPY . .
 
 RUN dotnet publish "MonobankExporter.Service/MonobankExporter.Service.csproj" \
@@ -21,13 +21,13 @@ RUN dotnet publish "MonobankExporter.Service/MonobankExporter.Service.csproj" \
     --output /etc/monobank-exporter/publish \
     --no-restore \
     --nologo \
-    --runtime alpine-x64 \
+    --runtime linux-musl-x64 \
     --self-contained true \
     --verbosity quiet \
     /p:PublishTrimmed=true \
     /p:PublishSingleFile=true
 
-FROM mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/runtime-deps:8.0-alpine AS final
 
 RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime && apk upgrade musl
 
@@ -38,6 +38,6 @@ RUN apk add tzdata && cp /usr/share/zoneinfo/Europe/Kiev /etc/localtime && apk u
 #USER monobankuser
 
 WORKDIR /etc/monobank-exporter
-EXPOSE 80
+EXPOSE 8080
 COPY --from=publish /etc/monobank-exporter/publish .
 ENTRYPOINT ["./MonobankExporter.Service"]

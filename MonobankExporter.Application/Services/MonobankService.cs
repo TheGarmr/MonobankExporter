@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Monobank.Client;
+using Monobank.Client.Interfaces;
 using Monobank.Client.Models;
 using MonobankExporter.Application.Enums;
 using MonobankExporter.Application.Interfaces;
@@ -16,19 +16,22 @@ namespace MonobankExporter.Application.Services;
 
 public class MonobankService : IMonobankService
 {
-    private readonly IMonobankClient _monobankClient;
+    private readonly IMonobankMultiClientsService _monobankMultiClientsService;
+    private readonly IMonobankCurrenciesService _monobankCurrenciesService;
     private readonly ILookupsMemoryCacheService _cacheService;
     private readonly IMetricsExporterService _metricsExporter;
     private readonly ILogger<MonobankService> _logger;
     private readonly MemoryCacheEntryOptions _cacheOptions;
 
     public MonobankService(MonobankExporterOptions options,
-        IMonobankClient monobankClient,
+        IMonobankMultiClientsService monobankMultiClientsService,
+        IMonobankCurrenciesService monobankCurrenciesService,
         IMetricsExporterService metricsExporterService,
         ILookupsMemoryCacheService cacheService,
         ILogger<MonobankService> logger)
     {
-        _monobankClient = monobankClient;
+        _monobankMultiClientsService = monobankMultiClientsService;
+        _monobankCurrenciesService = monobankCurrenciesService;
         _metricsExporter = metricsExporterService;
         _cacheService = cacheService;
         _logger = logger;
@@ -68,15 +71,15 @@ public class MonobankService : IMonobankService
                     clientWebHookUrlIsValid = WebHookUrlIsValid(clientInfo.WebHookUrl);
                     if (clientWebHookUrlIsValid)
                     {
-                        webHookSetUpResponseFromApi = await _monobankClient.SetWebhookAsync(clientInfo.WebHookUrl, clientInfo.Token, stoppingToken);
+                        webHookSetUpResponseFromApi = await _monobankMultiClientsService.SetWebhookAsync(clientInfo.WebHookUrl, clientInfo.Token, stoppingToken);
                     }
                 }
                 else if (mainWebHookUrlIsValid)
                 {
-                    webHookSetUpResponseFromApi = await _monobankClient.SetWebhookAsync(webHookUrl, clientInfo.Token, stoppingToken);
+                    webHookSetUpResponseFromApi = await _monobankMultiClientsService.SetWebhookAsync(webHookUrl, clientInfo.Token, stoppingToken);
                 }
 
-                var userInfo = await _monobankClient.GetClientInfoAsync(clientInfo.Token, stoppingToken);
+                var userInfo = await _monobankMultiClientsService.GetClientInfoAsync(clientInfo.Token, stoppingToken);
                 if (userInfo == null)
                 {
                     continue;
@@ -126,7 +129,7 @@ public class MonobankService : IMonobankService
                 continue;
             }
 
-            var userInfo = await _monobankClient.GetClientInfoAsync(clientInfo.Token, stoppingToken);
+            var userInfo = await _monobankMultiClientsService.GetClientInfoAsync(clientInfo.Token, stoppingToken);
             if (!string.IsNullOrWhiteSpace(clientInfo.Name))
             {
                 _logger.LogTrace($"Client named as {userInfo.Name} will be displayed as {clientInfo.Name}");
@@ -140,7 +143,7 @@ public class MonobankService : IMonobankService
     {
         try
         {
-            var currencies = await _monobankClient.GetCurrenciesAsync(stoppingToken);
+            var currencies = await _monobankCurrenciesService.GetCurrenciesAsync(stoppingToken);
 
             var currenciesToObserve = currencies.Where(x =>
                 !string.IsNullOrWhiteSpace(x.CurrencyNameA) && !string.IsNullOrWhiteSpace(x.CurrencyNameB));
@@ -205,7 +208,7 @@ public class MonobankService : IMonobankService
         }
     }
 
-    private void ExportBalanceMetricsForUser(UserInfo userInfo)
+    private void ExportBalanceMetricsForUser(ClientInfo userInfo)
     {
         try
         {
@@ -235,7 +238,7 @@ public class MonobankService : IMonobankService
         }
     }
 
-    private void ExportJarsMetricsForUser(UserInfo userInfo)
+    private void ExportJarsMetricsForUser(ClientInfo userInfo)
     {
         if (userInfo.Jars == null || !userInfo.Jars.Any())
         {
