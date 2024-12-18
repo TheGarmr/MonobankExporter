@@ -146,3 +146,4 @@ monobank-api: #optional
   * v1.10 - Added export of actual jars
   * v1.11 - Upgraded .Net version to 7.0. Added minimal API.
   * v1.11.1 - Hotfix of missed adding configuration
+  * v1.12 - Upgraded to .net 8 and monobank-client library

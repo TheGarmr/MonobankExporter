@@ -1,7 +1,6 @@
 variables:
-  DOCKER_VERSION_MAJOR: "1"
-  DOCKER_VERSION_MINOR: "11"
-  DOCKER_IMAGE: mcr.microsoft.com/dotnet/sdk:7.0-alpine
+  VERSION_MAJOR: "1"
+  DOCKER_IMAGE: mcr.microsoft.com/dotnet/sdk:8.0-alpine
   DOCKER_IMAGE_NAME: monobank-exporter
   PROJECT_NAME: "MonobankExporter"
   PROJECT_REPOSITORY: "https://github.com/TheGarmr/monobank-exporter"
@@ -10,6 +9,7 @@ stages:
   - build
   - unit-tests
   - publish
+  - tag-new-version
 
 Build:
   stage: build
@@ -38,11 +38,48 @@ Publish docker image:
     - name: docker:20-dind
       alias: docker
       command: ["--tls=false"]
+  before_script:
+    - apk update && apk add --no-cache git
   script:
+    - CURRENT_VERSION_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --max-count=1) 2>/dev/null || echo "")
+    - CURRENT_VERSION_MAJOR=$(echo "${CURRENT_VERSION_TAG}" | cut -d'.' -f1)
+    - OLD_VERSION_MINOR=$(echo "${CURRENT_VERSION_TAG}" | cut -d'.' -f2)
+    - if [ $(echo "$CURRENT_VERSION_MAJOR" | tr -dc '0-9') -gt "${VERSION_MAJOR}" ]; then
+    -   NEW_VERSION="${CURRENT_VERSION_MAJOR}.0"
+    - else
+    -   NEW_VERSION="${CURRENT_VERSION_MAJOR}.$((${OLD_VERSION_MINOR} + 1))"
+    - fi
+    - echo "Building ${NEW_VERSION}"
+
     - echo "Logging into Docker Hub..."
     - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
-    - echo "Building image with version v$DOCKER_VERSION_MAJOR.$DOCKER_VERSION_MINOR.$CI_PIPELINE_IID"
-    - docker build --build-arg VERSION=$DOCKER_VERSION_MAJOR.$DOCKER_VERSION_MINOR.$CI_PIPELINE_IID --build-arg MAINTAINER=$DOCKER_HUB_USERNAME --build-arg URL=$PROJECT_REPOSITORY -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:v$DOCKER_VERSION_MAJOR.$DOCKER_VERSION_MINOR.$CI_PIPELINE_IID -f ./$PROJECT_NAME.Service/Dockerfile .
-    - docker tag $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:v$DOCKER_VERSION_MAJOR.$DOCKER_VERSION_MINOR.$CI_PIPELINE_IID $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
-    - docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:v$DOCKER_VERSION_MAJOR.$DOCKER_VERSION_MINOR.$CI_PIPELINE_IID
-    - docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest
+    - echo "Building image with version ${NEW_VERSION}"
+    - docker build --build-arg VERSION=${NEW_VERSION#v} --build-arg MAINTAINER=$DOCKER_HUB_USERNAME --build-arg URL=$PROJECT_REPOSITORY -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:${NEW_VERSION} -f ./$PROJECT_NAME.Service/Dockerfile .
+    - docker tag "$DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:${NEW_VERSION}" "$DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest"
+    - docker push "$DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:${NEW_VERSION}"
+    - docker push "$DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest"
+
+Tag new version:
+  image: alpine
+  stage: tag-new-version
+  allow_failure: false
+  interruptible: false
+  needs:
+    - Publish docker image
+  only:
+    - main
+  when: on_success
+  before_script:
+    - apk update && apk add --no-cache git
+  script:
+    - CURRENT_VERSION_TAG=$(git describe --abbrev=0 --tags $(git rev-list --tags --max-count=1) 2>/dev/null || echo "")
+    - CURRENT_VERSION_MAJOR=$(echo "${CURRENT_VERSION_TAG}" | cut -d'.' -f1)
+    - OLD_VERSION_MINOR=$(echo "${CURRENT_VERSION_TAG}" | cut -d'.' -f2)
+    - if [ $(echo "$CURRENT_VERSION_MAJOR" | tr -dc '0-9') -gt "${VERSION_MAJOR}" ]; then
+    -   NEW_VERSION_TAG="${CURRENT_VERSION_MAJOR}.0"
+    - else
+    -   NEW_VERSION_TAG="${CURRENT_VERSION_MAJOR}.$((${OLD_VERSION_MINOR} + 1))"
+    - fi
+    - echo "Current version tag - ${CURRENT_VERSION_TAG}. New version tag - ${NEW_VERSION_TAG}"
+    - git tag "${NEW_VERSION_TAG}"
+    - git push "${CI_SERVER_PROTOCOL}://gitlab-ci-token:${RUNNER_PERSONAL_ACCESS_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}" "${NEW_VERSION_TAG}"

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Monobank.Client;
 using Monobank.Client.Extensions;
 using MonobankExporter.Application.BackgroundServices;
 using MonobankExporter.Application.Interfaces;
@@ -54,8 +53,7 @@ internal static class ServiceCollectionExtensions
 
     internal static IServiceCollection AddMonobankClient(this IServiceCollection services, IConfiguration configuration)
     {
-        var options = configuration.GetSection("monobank-api").Get<MonobankClientOptions>() ?? new MonobankClientOptions();
-        services.AddMonobankClient(options);
+        services.AddMonobankMultiClientsService(options => configuration.GetSection("monobank-api").Bind(options));
         return services;
     }
 }
